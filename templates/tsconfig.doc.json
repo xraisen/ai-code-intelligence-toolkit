@@ -1,0 +1,32 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": false,
+    "emitDeclarationOnly": false,
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler"
+  },
+  "include": [
+    "src/**/*",
+    "scripts/**/*",
+    "mcp/**/*",
+    "types/typedoc-local-shims.d.ts",
+    "vite-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "docs/api",
+    "public/docs",
+    ".ai/code-graph",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
+}

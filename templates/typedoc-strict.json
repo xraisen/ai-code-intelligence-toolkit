@@ -1,0 +1,43 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src"
+  ],
+  "entryPointStrategy": "expand",
+  "skipErrorChecking": false,
+  "cleanOutputDir": true,
+  "validation": {
+    "invalidLink": false,
+    "notExported": false
+  },
+  "excludeNotDocumented": false,
+  "out": "docs/api",
+  "name": "Project API Documentation Strict Check",
+  "includeVersion": true,
+  "readme": "README.md",
+  "tsconfig": "tsconfig.doc.json",
+  "excludeNotDocumentedKinds": [],
+  "excludeExternals": true,
+  "exclude": [
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/node_modules/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "docs/**",
+    "public/docs/**",
+    ".ai/code-graph/**"
+  ],
+  "disableSources": false,
+  "sourceLinkTemplate": "{path}#L{line}",
+  "sidebarLinks": {
+    "Documentation": "/docs/",
+    "API Dictionary": "/docs/api/"
+  }
+}
