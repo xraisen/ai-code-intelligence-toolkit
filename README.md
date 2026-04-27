@@ -12,6 +12,122 @@ It is designed for developers using AI coding tools such as Codex, Claude Code, 
 
 ---
 
+## Companion prerequisite: Repo B
+
+For the **complete benchmarked workflow**, install this toolkit together with:
+
+```txt
+typedoc-hybrid-source-links
+```
+
+Repo A focuses on AI-agent code intelligence:
+
+```txt
+GraphRAG/code graph
+smart ai:preflight
+ai:spec
+graph doctor
+leak checking
+MCP-ready code intelligence
+```
+
+Repo B focuses on TypeDoc source-link intelligence:
+
+```txt
+local VS Code source links
+GitHub blob source links
+typedoc:health
+typedoc:doctor
+typedoc:check-local
+AI-context-safe TypeDoc JSON
+```
+
+### Relationship
+
+| Setup | Supported? | Notes |
+|---|---:|---|
+| Repo A only | Yes | GraphRAG, preflight, spec, doctor, and leak checks work. TypeDoc commands require a compatible TypeDoc setup. |
+| Repo B only | Yes | Hybrid TypeDoc local/GitHub source links work independently. |
+| Repo A + Repo B | Recommended | This is the full validated workflow and the setup used for the benchmark images below. |
+
+Install both for the full workflow:
+
+```bash
+npm install --save-dev ai-code-intelligence-toolkit typedoc-hybrid-source-links typedoc
+npx typedoc-hybrid-install --target . --overwrite
+npx ai-code-intel-install --target . --overwrite
+```
+
+Run the full health gate:
+
+```bash
+npm run typedoc:health
+npm run typedoc:doctor
+npm run ai:preflight -- "Patch only GraphRAG builder and doctor exclude rules."
+npm run ai:preflight -- "Patch only TypeDoc hybrid source-link generation. Do not touch app runtime code."
+npm run ai:graph:build
+npm run ai:graph:doctor
+npm run ai:graph:check-leaks
+```
+
+Expected result:
+
+```txt
+typedoc:health        ok: true
+typedoc:doctor        ok: true
+ai:preflight          route.id present and allowedPatchFiles populated
+ai:graph:build        ok: true and timedOut: false
+ai:graph:doctor       ok: true
+ai:graph:check-leaks  ok: true and leakCount: 0
+```
+
+---
+
+## Benchmark images
+
+Place benchmark images in this repo at:
+
+```txt
+docs/assets/repo-performance-benchmark-before-vs-after.png
+docs/assets/repo-comparison-and-ecosystem-analysis.png
+```
+
+Recommended repo structure:
+
+```txt
+ai-code-intelligence-toolkit/
+├── docs/
+│   └── assets/
+│       ├── repo-performance-benchmark-before-vs-after.png
+│       └── repo-comparison-and-ecosystem-analysis.png
+├── scripts/
+├── templates/
+├── bin/
+├── README.md
+└── LICENSE
+```
+
+Then embed them in this README:
+
+```md
+![Before vs After: Repo A + Repo B Benchmark](docs/assets/repo-performance-benchmark-before-vs-after.png)
+
+![Repo A + Repo B vs Popular Coding-Agent Ecosystems](docs/assets/repo-comparison-and-ecosystem-analysis.png)
+```
+
+### Before vs After benchmark
+
+![Before vs After: Repo A + Repo B Benchmark](docs/assets/repo-performance-benchmark-before-vs-after.png)
+
+### Public ecosystem comparison
+
+![Repo A + Repo B vs Popular Coding-Agent Ecosystems](docs/assets/repo-comparison-and-ecosystem-analysis.png)
+
+> The images are visual summaries of local validation logs and public tool/model sources. They should be treated as workflow benchmarks, not universal model-IQ benchmarks.
+
+
+---
+
 ## Why this exists
 
 Modern coding agents are powerful, but most mistakes in real repositories are not caused by weak syntax generation. They often come from workflow problems:
