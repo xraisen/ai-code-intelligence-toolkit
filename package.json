@@ -1,10 +1,10 @@
 {
   "name": "ai-code-intelligence-toolkit",
-  "version": "1.0.0",
-  "description": "Reusable AI-agent code intelligence toolkit with local GraphRAG, smart preflight routing, generated-file leak checks, MCP-ready repo inspection, and a documented dependency on typedoc-hybrid-source-links for full TypeDoc source-link support.",
+  "version": "1.0.1",
+  "description": "Codex-compatible AI code intelligence toolkit with local GraphRAG, smart preflight patch scoping, AGENTS.md guardrails, MCP-ready repo inspection, and generated-file leak checks.",
   "type": "module",
   "license": "MIT",
-  "author": "Jose",
+  "author": "xraisen",
   "bin": {
     "ai-code-intel-install": "./bin/install.mjs"
   },
@@ -13,18 +13,49 @@
     "smoke": "node bin/smoke-test.mjs"
   },
   "keywords": [
-    "ai",
     "codex",
+    "agents-md",
+    "ai-coding-agent",
     "graphrag",
     "code-intelligence",
-    "typedoc",
     "mcp",
-    "developer-tools"
+    "typescript",
+    "developer-tools",
+    "claude-code",
+    "cursor",
+    "cline",
+    "roocode",
+    "ai-code-review",
+    "repo-analysis"
   ],
   "files": [
     "bin",
     "templates",
     "README.md",
-    "LICENSE"
-  ]
+    "LICENSE",
+    "docs",
+    "benchmark.json",
+    "AGENTS.template.md",
+    "README_SECTION.template.md",
+    "HEALTH_REPORT.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xraisen/ai-code-intelligence-toolkit.git"
+  },
+  "bugs": {
+    "url": "git+https://github.com/xraisen/ai-code-intelligence-toolkit/issues"
+  },
+  "homepage": "git+https://github.com/xraisen/ai-code-intelligence-toolkit#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "typedoc": ">=0.25.0"
+  },
+  "peerDependenciesMeta": {
+    "typedoc": {
+      "optional": true
+    }
+  }
 }

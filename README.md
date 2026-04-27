@@ -57,7 +57,7 @@ npm install --save-dev ai-code-intelligence-toolkit
 npx ai-code-intel-install --target . --overwrite
 ```
 
-For the complete validated workflow, install it with the companion TypeDoc source-link toolkit:
+For the complete validated workflow, install it with the TypeDoc Hybrid Source Links companion toolkit:
 
 ```bash
 npm install --save-dev ai-code-intelligence-toolkit typedoc-hybrid-source-links typedoc
@@ -80,18 +80,33 @@ npm run ai:graph:query -- "specific symbol, file, route, error, or feature"
 
 ---
 
+## Benchmark visuals
+
+The benchmark images use repository-relative paths so they work on GitHub after the PNG files are committed.
+
+```txt
+docs/assets/repo-performance-benchmark-before-vs-after.png
+docs/assets/repo-comparison-and-ecosystem-analysis.png
+```
+
+![Before vs After: AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links](docs/assets/repo-performance-benchmark-before-vs-after.png)
+
+![Workflow comparison and ecosystem context](docs/assets/repo-comparison-and-ecosystem-analysis.png)
+
+
+
 ## Benchmark: unstructured AI coding vs guarded Codex-compatible workflow
 
 This benchmark compares two developer workflows:
 
 | Workflow | Meaning |
 |---|---|
-| **Without Repo A + Repo B** | A developer or vibe coder asks an AI coding agent to inspect, search, or fix the repository without a graph, preflight scope, generated-file leak check, or TypeDoc source-link health check. The practical risk surface is the repo surface the agent may inspect or patch. |
-| **With Repo A + Repo B** | A developer or Codex user runs the guarded workflow: `AGENTS.md` instructions, `ai:spec`, `ai:preflight`, local graph build, graph doctor, leak checker, and TypeDoc health checks before patching. |
+| **Without AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links** | A developer or vibe coder asks an AI coding agent to inspect, search, or fix the repository without a graph, preflight scope, generated-file leak check, or TypeDoc source-link health check. The practical risk surface is the repo surface the agent may inspect or patch. |
+| **With AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links** | A developer or Codex user runs the guarded workflow: `AGENTS.md` instructions, `ai:spec`, `ai:preflight`, local graph build, graph doctor, leak checker, and TypeDoc health checks before patching. |
 
 This is a **workflow benchmark**, not a model benchmark. It does not compare Codex vs Claude vs Cursor vs Kimi. It compares coding with no repo guardrails against coding with a Codex-compatible repo intelligence layer.
 
-| Metric | Without Repo A + Repo B | With Repo A + Repo B | Result |
+| Metric | Without AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links | With AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links | Result |
 |---|---:|---:|---:|
 | Patch boundary | No deterministic patch boundary | 6 GraphRAG files / 11 TypeDoc files | Fixed |
 | Repo surface exposed to task | Up to 723 indexed files | 6–11 allowed patch files | 98.48%–99.17% less patch surface |
@@ -225,6 +240,41 @@ Do not begin with broad repository search unless the graph and source-truth rout
 ```
 
 ---
+
+## Release health checklist
+
+Before publishing a release, run:
+
+```bash
+npm run smoke
+node --check bin/install.mjs
+node --check bin/smoke-test.mjs
+```
+
+After installing into a target repo, run:
+
+```bash
+npm run typedoc:health
+npm run typedoc:doctor
+npm run ai:spec -- "Smoke test AI intelligence workflow."
+npm run ai:preflight -- "Patch only GraphRAG builder and doctor exclude rules."
+npm run ai:graph:build
+npm run ai:graph:doctor
+npm run ai:graph:check-leaks
+```
+
+A healthy install should produce:
+
+```txt
+typedoc:health        ok: true
+typedoc:doctor        ok: true
+ai:preflight          route.id present and allowedPatchFiles populated
+ai:graph:build        ok: true and timedOut: false
+ai:graph:doctor       ok: true
+ai:graph:check-leaks  ok: true and leakCount: 0
+```
+
+
 
 ## Suggested repository description
 
