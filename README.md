@@ -40,6 +40,26 @@ Without it, the TypeDoc commands still work, but the local-vs-public link behavi
 - Better docs navigation: local TypeDoc links open in the editor, while public docs point at GitHub blobs.
 - Safer agent work: leak checks catch generated output or noisy files before they get treated as source.
 
+## Showcase Scenario
+
+Imagine a TypeScript monorepo with a broken API doc link, a failing generated-file check, and a request to update one service without touching the rest of the tree.
+
+With this toolkit, the workflow becomes:
+
+1. Run `ai:preflight` to identify the exact files that matter.
+2. Use the graph query command to jump from the user request to the right symbols and source files.
+3. Patch the smallest possible scope.
+4. Run the validation commands to confirm the graph, leak checks, and TypeDoc workflow still hold.
+
+Why this is valuable:
+
+- The agent stays anchored to repository truth instead of guessing from search results.
+- The patch stays small enough to review quickly.
+- The docs path remains split correctly: local development opens source in VS Code, while public docs resolve to GitHub.
+- The repo stays safer because generated output is checked before it can pass as source.
+
+In practice, that means less time spent navigating, less accidental drift, and a better documentation experience for both humans and AI tools.
+
 ## Install into another repo
 
 ```bash
