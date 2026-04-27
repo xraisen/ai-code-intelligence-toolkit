@@ -1,43 +1,41 @@
 # AI Code Intelligence Toolkit
 
-Reusable local AI-agent tooling for JavaScript/TypeScript repositories.
+Local AI-agent tooling for JavaScript and TypeScript repositories.
 
 **Ground Truth first. Graph second. Patch smallest. Validate focused.**
 
-This toolkit installs a local GraphRAG-style code graph, smart preflight routing, spec-driven execution helpers, generated-file leak checks, MCP-compatible code intelligence, and the TypeDoc source-link workflow needed for AI-friendly API context.
+This toolkit gives you a local GraphRAG-style code graph, smart preflight routing, spec-driven execution helpers, generated-file leak checks, MCP-compatible code intelligence, and TypeDoc source-link support for AI-friendly API context.
 
 ## Prerequisite
 
-This toolkit is fully effective when the target repository also uses
+For full TypeDoc source-link behavior, the target repository should also use
 [typedoc-hybrid-source-links](https://github.com/xraisen/typedoc-hybrid-source-links).
-That package provides the hybrid local/GitHub TypeDoc source-link generation,
-health checks, and AI-safe docs output that this toolkit expects.
+That package provides the local VS Code links, public GitHub links, and health checks this toolkit expects.
 
-Without it, the TypeDoc commands can still exist, but the local-vs-public source-link
-behavior documented here will be incomplete.
+Without it, the TypeDoc commands still work, but the local-vs-public link behavior will be incomplete.
 
 ## Features
 
-- Fast local code graph generation with bounded scanning.
-- Graph query command that returns related files, symbols, relationships, and safe read commands.
+- Fast local graph generation with bounded scanning.
+- Graph queries that return related files, symbols, relationships, and safe read commands.
 - Health checks for graph artifacts, required scripts, required files, and generated-output leaks.
 - Smart `ai:preflight` routing that returns allowed read files, allowed patch files, forbidden hints, and validation commands.
 - `ai:spec` output for implementation planning and drift control.
-- TypeDoc hybrid source links: local docs open in VS Code; public docs open in GitHub.
-- Installer that injects package scripts and optional AGENTS/README instructions into an existing repository.
+- TypeDoc hybrid source links: local docs open in VS Code, public docs open in GitHub.
+- An installer that injects package scripts and optional AGENTS/README instructions into an existing repository.
 - Zero runtime npm dependencies for the AI tooling scripts.
 
 ## Use Cases
 
 - Large TypeScript repos where agents need a short path from intent to the right files.
 - Multi-package codebases that need targeted patching instead of broad repository scanning.
-- Repositories with public API docs where local source links should stay editor-friendly while published docs should resolve to GitHub.
-- Teams that want a repeatable preflight before patching, so the agent sees the same ground truth every time.
-- Onboarding new contributors or assistants into a codebase that benefits from a clear source-of-truth order.
+- Public API docs that should stay editor-friendly locally and resolve to GitHub when published.
+- Teams that want a repeatable preflight before patching so every run starts from the same ground truth.
+- New contributors or assistants who need a clear source-of-truth order before editing.
 
 ## Where It Helps Most
 
-- Faster repo orientation: graph queries reduce blind search across the tree.
+- Faster repo orientation: graph queries cut down blind search across the tree.
 - Less patch drift: `ai:preflight` narrows the allowed files before edits start.
 - Better docs navigation: local TypeDoc links open in the editor, while public docs point at GitHub blobs.
 - Safer agent work: leak checks catch generated output or noisy files before they get treated as source.
