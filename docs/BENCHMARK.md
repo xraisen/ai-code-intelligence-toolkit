@@ -1,91 +1,85 @@
 ## Benchmark: unstructured AI coding vs guarded Codex-compatible workflow
 
-Benchmarked toolchain: **AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links**.
-
-This benchmark compares two developer workflows:
+This benchmark compares two workflows:
 
 | Workflow | Meaning |
 |---|---|
-| **Without AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links** | A developer or vibe coder asks an AI coding agent to inspect, search, or fix the repository without a graph, preflight scope, generated-file leak check, or TypeDoc source-link health check. The practical risk surface is the repo surface the agent may inspect or patch. |
-| **With AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links** | A developer or Codex user runs the guarded workflow: `AGENTS.md` instructions, `ai:spec`, `ai:preflight`, local graph build, graph doctor, leak checker, and TypeDoc health checks before patching. |
+| **Without these tools** | A developer or vibe coder asks an AI assistant to inspect, search, or fix a repository without a graph, task preflight, generated-file leak check, or TypeDoc source-link health check. The practical risk surface is the repo surface the assistant may inspect or patch. |
+| **With AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links** | A developer runs a Codex-compatible workflow with `AGENTS.md`, `ai:spec`, `ai:preflight`, a local graph, graph doctor, leak checker, and TypeDoc health checks before patching. |
 
-This is a **workflow benchmark**, not a model benchmark. It does not compare Codex vs Claude vs Cursor vs Kimi. It compares coding with no repo guardrails against coding with a Codex-compatible repo intelligence layer.
+This is a **workflow benchmark**, not a model benchmark. It does not claim to make Codex, Claude, Cursor, Cline, RooCode, Kimi, or any assistant smarter. It measures scope control, graph health, leak detection, and documentation-link health around an assistant.
 
-| Metric | Without AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links | With AI Code Intelligence Toolkit + TypeDoc Hybrid Source Links | Result |
+### Tested environment
+
+The workflow has been tested only with:
+
+```txt
+Codex CLI
+Codex Windows app workflow
+Windows repository worktree
+Node.js >= 20
+```
+
+Other AI assistants may use the same npm scripts because they are plain Node.js commands, but this README does **not** claim they are tested.
+
+### Real local validation result
+
+| Metric | Without these tools | With these tools | Result |
 |---|---:|---:|---:|
 | Patch boundary | No deterministic patch boundary | 6 GraphRAG files / 11 TypeDoc files | Fixed |
-| Repo surface exposed to task | Up to 723 indexed files | 6–11 allowed patch files | 98.48%–99.17% less patch surface |
+| Repo surface exposed to the task | Up to 723 indexed files | 6–11 allowed patch files | 98.48%–99.17% narrower patch surface |
 | Graph build | Unreliable / timeout-prone baseline | 1.378s, `timedOut: false` | Fast and repeatable |
 | Graph doctor | Previously unhealthy | `ok: true` | Pass |
 | Generated-file leaks | 1 leak | 0 leaks | 100% leak reduction |
 | TypeDoc health | Unconfirmed | `ok: true` | Pass |
 | TypeDoc doctor | Unconfirmed | `ok: true` | Pass |
-| Workflow smoke gates | No structured health gate | 8/8 passed | 100% workflow pass |
+| Workflow smoke gates | No structured health gate | 8/8 passed | 100% workflow pass for tested gates |
 | Files processed by graph | — | 723 | Measured |
 | Source files indexed | — | 466 | Measured |
 | Graph nodes | — | 5,320 | Measured |
 | Graph edges | — | 15,745 | Measured |
 
-### Token and cost exposure model
+### File-surface exposure model
 
-The validation run did not record raw token telemetry. Instead, the benchmark calculates **file-surface exposure**, which is the correct proxy for token and cost waste in repo-navigation tasks.
-
-Why this matters: token-priced coding agents charge or consume credits based on input, cached input, and output tokens. When an unstructured workflow reads or pastes more repo content than necessary, input token exposure rises.
+The validation run did not record raw token telemetry. Instead, this project reports **file-surface exposure**, which is the safest way to explain why token and cost waste may drop as a side effect.
 
 ```txt
 GraphRAG task:
-  Without tool: 723-file repo surface
-  With tool: 6 allowed patch files
+  Without the tools: 723-file repo surface
+  With the tools: 6 allowed patch files
   Surface reduction: 1 - (6 / 723) = 99.17%
   Unstructured workflow exposes 120.50x more file surface
-  Extra token/cost exposure proxy: 11950.0% more than guarded workflow
 
 TypeDoc task:
-  Without tool: 723-file repo surface
-  With tool: 11 allowed patch files
+  Without the tools: 723-file repo surface
+  With the tools: 11 allowed patch files
   Surface reduction: 1 - (11 / 723) = 98.48%
   Unstructured workflow exposes 65.73x more file surface
-  Extra token/cost exposure proxy: 6472.7% more than guarded workflow
 
 Average of the two tested scopes:
   Average allowed patch files: 8.5
   Average surface reduction: 1 - (8.5 / 723) = 98.82%
   Unstructured workflow exposes 85.06x more file surface
-  Extra token/cost exposure proxy: 8405.9% more than guarded workflow
 ```
 
-### How to read the token/cost numbers
+### Token and cost honesty
 
-| Claim | Status |
-|---|---|
-| “Measured token reduction was exactly X%.” | Not claimed. Token telemetry was not captured. |
-| “The guarded workflow reduced patchable file-surface exposure by 98.48%–99.17%.” | Supported by the validation log. |
-| “If token usage scales with file context loaded, unstructured vibe coding can expose 65.73x–120.50x more input context for these tasks.” | Supported as a calculated exposure model. |
-| “Cost exposure can drop in the same direction because Codex-style usage is token-based.” | Supported as a pricing-model inference, not a billing guarantee. |
+This is **not** sold as a token-saving or money-saving tool.
 
-### Developer time exposure model
-
-Developer time follows the same surface-area problem. Without a tool, the developer or agent may inspect, reason over, or validate against a much larger repo surface. With the tool, the task is narrowed to 6–11 patchable files.
-
-| Task type | No-tool review surface | Tool-guided patch surface | Review effort avoided |
-|---|---:|---:|---:|
-| GraphRAG tooling task | 723 files | 6 files | 717 files avoided |
-| TypeDoc tooling task | 723 files | 11 files | 712 files avoided |
-| Average | 723 files | 8.5 files | 714.5 files avoided |
-
-If a developer spends even 1 minute deciding whether each file matters, the avoided review effort is approximately:
+The primary purpose is precision:
 
 ```txt
-GraphRAG task: 717 minutes avoided
-TypeDoc task: 712 minutes avoided
-Average: 714.5 minutes avoided
+better file targeting
+smaller patch boundaries
+less wrong-file drift
+health checks before patching
+local graph-based repo understanding
+TypeDoc links that point to the right source location
 ```
 
-That is a time-exposure model, not a stopwatch claim. The actual measured runtime is the graph build: **~1.378 seconds**.
+Lower token or cost exposure can happen as a side effect when an assistant reads fewer irrelevant files. But exact token or billing savings require real telemetry from the assistant session: input tokens, cached input tokens, output tokens, files read, and files patched.
 
-### Drift and accuracy model
-
-This toolkit measures workflow accuracy, not final code correctness across a large human-labeled benchmark.
+### Drift and workflow accuracy
 
 Measured workflow accuracy in the validation run:
 
@@ -100,23 +94,10 @@ Measured workflow accuracy in the validation run:
 | `ai:graph:check-leaks` | Pass |
 | `ai:spec` smoke test | Pass |
 
-Result:
-
 ```txt
-8 / 8 workflow gates passed = 100% workflow pass rate
+8 / 8 workflow gates passed = 100% workflow pass rate for the tested gates.
+Generated-file graph leaks: 1 → 0 = 100% leak reduction.
+Patch drift surface: 98.48%–99.17% narrower than the 723-file indexed surface.
 ```
 
-Drift reduction:
-
-```txt
-Generated-file graph leaks:
-  Before: 1
-  After: 0
-  Reduction: 100%
-
-Patch drift surface:
-  GraphRAG task: 99.17% less patchable surface
-  TypeDoc task: 98.48% less patchable surface
-```
-
-For true code accuracy, create a separate benchmark with real tasks, expected files, expected tests, human review, and pass/fail outcomes.
+For true code-correctness accuracy, use a separate labeled benchmark with real tasks, expected files, expected tests, human review, and pass/fail outcomes.
