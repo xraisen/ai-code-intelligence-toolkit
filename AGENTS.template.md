@@ -12,6 +12,10 @@ Use this section as an installable AI-agent operating contract.
 
 Do not start with broad repository search unless the graph and symbol contract fail.
 
+## TypeDoc prerequisite
+
+Use [typedoc-hybrid-source-links](https://github.com/xraisen/typedoc-hybrid-source-links) in the target repository when source-link quality matters. It is the prerequisite that makes local VS Code links and public GitHub links behave correctly.
+
 ## Required commands
 ```bash
 npm run ai:spec -- "task description"

@@ -21,6 +21,11 @@ npm run smoke
 - `typedoc-hybrid-source-links`: PASS
 - `ai-code-intelligence-toolkit`: PASS
 
+## Benchmark Note
+
+This report is a functional validation record, not a performance benchmark.
+The evidence below shows the packaging and command contracts work as expected; it does not claim throughput, latency, or tokens-per-second numbers.
+
 ## Smoke Test Coverage
 
 `typedoc-hybrid-source-links` installed into a temporary fixture and ran:

@@ -1,9 +1,10 @@
 {
   "name": "ai-code-intelligence-toolkit",
   "version": "1.0.0",
-  "description": "Reusable AI-agent code intelligence toolkit with local GraphRAG, smart preflight routing, generated-file leak checks, MCP-ready repo inspection, and bundled hybrid TypeDoc source links.",
+  "description": "Reusable AI-agent code intelligence toolkit with local GraphRAG, smart preflight routing, generated-file leak checks, MCP-ready repo inspection, and a documented dependency on typedoc-hybrid-source-links for full TypeDoc source-link support.",
   "type": "module",
   "license": "MIT",
+  "author": "Jose",
   "bin": {
     "ai-code-intel-install": "./bin/install.mjs"
   },
