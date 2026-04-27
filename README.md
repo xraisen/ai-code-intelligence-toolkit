@@ -6,6 +6,27 @@ Local AI-agent tooling for JavaScript and TypeScript repositories.
 
 This toolkit gives you a local GraphRAG-style code graph, smart preflight routing, spec-driven execution helpers, generated-file leak checks, MCP-compatible code intelligence, and TypeDoc source-link support for AI-friendly API context.
 
+## Showcase Scenario
+
+You inherit a medium-sized TypeScript repo with scattered utilities, stale docs, and no clear entry point.
+
+The workflow looks like this:
+
+1. Run `npm run ai:graph:doctor` to confirm the graph and contract files are healthy.
+2. Run `npm run ai:preflight -- "add a retryable API client"` to get a focused file set, patch scope, and validation commands.
+3. Use `npm run ai:graph:query -- "retry client"` to trace the relevant symbols before editing.
+4. Implement the smallest possible patch, then validate with the commands returned by preflight.
+5. Finish with `npm run ai:graph:check-leaks` so generated output does not slip into source control.
+
+The result is a disciplined loop:
+
+- faster repo orientation
+- fewer blind edits
+- clearer validation
+- safer handoff to humans and agents
+
+When the toolkit is installed into another repository, that same flow turns into a repeatable operating model instead of an ad hoc search exercise.
+
 ## Prerequisite
 
 For full TypeDoc source-link behavior, the target repository should also use

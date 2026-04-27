@@ -2,6 +2,20 @@
 
 Local AI-agent tooling for source-of-truth navigation, GraphRAG-style code graph generation, smart preflight routing, and hybrid TypeDoc source links.
 
+### Showcase Scenario
+
+Picture a repository that has grown organically: the paths are not obvious, the docs are stale, and new changes need to be made without widening the blast radius.
+
+The toolkit turns that situation into a repeatable loop:
+
+1. Run `npm run ai:graph:doctor` to confirm the local graph and required files are healthy.
+2. Run `npm run ai:preflight -- "describe the work"` to get a bounded patch plan and validation commands.
+3. Use `npm run ai:graph:query -- "symbol or feature name"` to locate the right files before editing.
+4. Apply the smallest possible change and validate using the commands returned by preflight.
+5. Finish with `npm run ai:graph:check-leaks` to keep generated output out of source files.
+
+That flow gives contributors and agents the same source of truth: search less, patch less, validate more.
+
 ### Prerequisite
 
 Full TypeDoc source-link behavior depends on
