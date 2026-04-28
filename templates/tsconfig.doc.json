@@ -1,6 +1,8 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "allowJs": true,
     "checkJs": false,
     "declaration": false,
@@ -9,12 +11,17 @@
     "noEmit": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "moduleResolution": "bundler"
+    "strict": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": []
   },
   "include": [
     "src/**/*",
     "scripts/**/*",
+    "bin/**/*",
     "mcp/**/*",
+    "templates/**/*",
     "types/typedoc-local-shims.d.ts",
     "vite-env.d.ts"
   ],
@@ -24,6 +31,8 @@
     "build",
     "coverage",
     "docs/api",
+    "docs/api-local",
+    "docs/api-github",
     "public/docs",
     ".ai/code-graph",
     "**/*.test.*",

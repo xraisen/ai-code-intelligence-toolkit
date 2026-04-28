@@ -204,12 +204,52 @@ function hardenForDocs(config) {
   config.disableSources = false;
 }
 
+
+function pathExistsFromRoot(relPath) {
+  return fs.existsSync(path.resolve(cwd, relPath));
+}
+
+function normalizeEntryPointsForExistingRepo(config) {
+  const requested = Array.isArray(config.entryPoints) ? config.entryPoints : [];
+  const existingRequested = requested.filter((entry) => typeof entry === "string" && pathExistsFromRoot(entry));
+
+  if (existingRequested.length) {
+    config.entryPoints = existingRequested;
+    return { changed: existingRequested.length !== requested.length, entryPoints: config.entryPoints, fallbackUsed: false };
+  }
+
+  const fallbackCandidates = [
+    "src",
+    "scripts",
+    "bin",
+    "mcp",
+    "templates/scripts",
+    "templates/bin",
+  ];
+  const fallback = fallbackCandidates.filter((entry) => pathExistsFromRoot(entry));
+
+  if (fallback.length) {
+    config.entryPoints = fallback;
+    return { changed: true, entryPoints: config.entryPoints, fallbackUsed: true };
+  }
+
+  const placeholderDir = path.join(cwd, ".ai", "typedoc");
+  const placeholderFile = path.join(placeholderDir, "empty-entry.ts");
+  fs.mkdirSync(placeholderDir, { recursive: true });
+  if (!fs.existsSync(placeholderFile)) {
+    fs.writeFileSync(placeholderFile, "export {};\n");
+  }
+  config.entryPoints = [".ai/typedoc/empty-entry.ts"];
+  return { changed: true, entryPoints: config.entryPoints, fallbackUsed: true, placeholder: ".ai/typedoc/empty-entry.ts" };
+}
+
 const selectedMode = selectMode();
 const config = readJsonc(baseConfigPath);
 const baseName = path.basename(baseConfigPath);
 const isFrontendConfig = baseName.includes("frontend");
 
 hardenForDocs(config);
+const entryPointNormalization = normalizeEntryPointsForExistingRepo(config);
 
 if (selectedMode === "local") {
   const projectRoot = path.resolve(process.env.TYPEDOC_PROJECT_ROOT || cwd);
@@ -246,6 +286,8 @@ console.log(
       skipErrorChecking: config.skipErrorChecking,
       sourceLinkTemplate: config.sourceLinkTemplate,
       excludeCount: config.exclude?.length ?? 0,
+      entryPoints: config.entryPoints,
+      entryPointNormalization,
     },
     null,
     2

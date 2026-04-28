@@ -1,7 +1,10 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": [
-    "src"
+    "src",
+    "scripts",
+    "bin",
+    "mcp"
   ],
   "entryPointStrategy": "expand",
   "skipErrorChecking": true,
@@ -15,7 +18,7 @@
   "name": "Project API Documentation",
   "includeVersion": true,
   "readme": "README.md",
-  "tsconfig": "tsconfig.doc.json",
+  "tsconfig": "./tsconfig.doc.json",
   "excludeNotDocumentedKinds": [],
   "excludeExternals": true,
   "exclude": [

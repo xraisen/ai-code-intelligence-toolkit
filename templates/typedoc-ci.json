@@ -2,7 +2,10 @@
   "$schema": "https://typedoc.org/schema.json",
   "tsconfig": "./tsconfig.doc.json",
   "entryPoints": [
-    "src"
+    "src",
+    "scripts",
+    "bin",
+    "mcp"
   ],
   "entryPointStrategy": "expand",
   "exclude": [
