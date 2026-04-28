@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "bin": {
-    "ai-code-intel-install": "./bin/install.mjs"
+    "ai-code-intel-install": "bin/install.mjs"
   },
   "scripts": {
     "install:toolkit": "node bin/install.mjs",
