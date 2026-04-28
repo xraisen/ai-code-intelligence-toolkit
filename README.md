@@ -1,5 +1,34 @@
 # AI Code Intelligence Toolkit
 
+> **Required companion for the complete tested workflow:** [TypeDoc Hybrid Source Links](https://github.com/xraisen/typedoc-hybrid-source-links)  
+> **This repository:** [AI Code Intelligence Toolkit](https://github.com/xraisen/ai-code-intelligence-toolkit)
+
+**Required companion links:**
+
+```txt
+AI Code Intelligence Toolkit: https://github.com/xraisen/ai-code-intelligence-toolkit
+TypeDoc Hybrid Source Links: https://github.com/xraisen/typedoc-hybrid-source-links
+```
+
+Install the complete tested workflow:
+
+```bash
+npm install --save-dev ai-code-intelligence-toolkit typedoc-hybrid-source-links typedoc
+npx typedoc-hybrid-install --target . --overwrite
+npx ai-code-intel-install --target . --overwrite
+```
+
+Run the final health gate:
+
+```bash
+npm run typedoc:health
+npm run typedoc:json:local
+npm run typedoc:check-local
+npm run ai:graph:build
+npm run ai:graph:doctor
+npm run ai:graph:check-leaks
+```
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-green.svg)](https://nodejs.org/)
 [![Tested Workflow](https://img.shields.io/badge/tested-Codex%20CLI%20%2B%20Windows%20app-111827)](#tested-environment)

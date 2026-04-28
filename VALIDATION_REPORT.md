@@ -1,42 +1,23 @@
-# Validation Report — v1.0.2
+# AI Code Intelligence Toolkit Validation Report
 
-Validated package health checks performed in the packaging environment.
+Validated release target: v1.0.5
 
-## Scope
+## Required companion links
 
-- README updated with evidence-safe benchmark wording.
-- Product names use actual names only.
-- Claims limited to Codex CLI and Codex Windows app workflow.
-- Trademark/affiliation notice added.
-- Benchmark images regenerated without vendor logos.
-- Old duplicate benchmark image filenames removed.
-- Token/cost positioning corrected: precision first; lower exposure is a side effect.
+- AI Code Intelligence Toolkit: https://github.com/xraisen/ai-code-intelligence-toolkit
+- TypeDoc Hybrid Source Links: https://github.com/xraisen/typedoc-hybrid-source-links
 
-## Packaged images
+## Required final health gate
 
-- `docs/assets/codex-windows-tested-benchmark.png`
-- `docs/assets/precision-workflow-diagram.png`
+```bash
+npm run typedoc:health
+npm run typedoc:json:local
+npm run typedoc:check-local
+npm run ai:graph:build
+npm run ai:graph:doctor
+npm run ai:graph:check-leaks
+```
 
+## Result required for release
 
-## Automated validation
-
-FAILED
-
-- README.md: contains banned wording official OpenAI
-
-## Automated validation
-
-FAILED
-
-- README.md: contains banned wording official OpenAI
-
-## Automated validation v1.0.2 final
-
-PASS
-
-- README wording check: PASS
-- Image path check: PASS
-- package.json parse: PASS
-- benchmark.json parse: PASS
-- node --check all `.mjs` files: PASS
-- npm run smoke: PASS
+All commands must return `ok: true`, `typedoc:check-local` must have no errors, and `ai:graph:check-leaks` must report `leakCount: 0`.

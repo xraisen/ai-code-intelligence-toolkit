@@ -1,11 +1,11 @@
 {
   "name": "ai-code-intelligence-toolkit",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Codex-compatible local code intelligence toolkit with GraphRAG-style repo graph, smart preflight patch scoping, generated-file leak checks, and AGENTS.md workflow guardrails. Tested with Codex CLI and Codex Windows app workflow.",
   "type": "module",
   "license": "MIT",
   "bin": {
-    "ai-code-intel-install": "bin/install.mjs"
+    "ai-code-intel-install": "./bin/install.mjs"
   },
   "scripts": {
     "install:toolkit": "node bin/install.mjs",
@@ -30,7 +30,9 @@
     "VALIDATION_REPORT.md",
     "benchmark.json",
     "index.js",
+    "PATCH_NOTES_v1.0.5.md",
     "PATCH_NOTES_v1.0.3.md",
+    "PATCH_NOTES_v1.0.4.md",
     "bin",
     "docs",
     "templates"

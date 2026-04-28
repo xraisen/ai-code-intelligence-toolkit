@@ -1,5 +1,11 @@
 # AI Code Intelligence Toolkit Rules
 
+Required companion for complete tested workflow: TypeDoc Hybrid Source Links
+https://github.com/xraisen/typedoc-hybrid-source-links
+
+This repository/tool:
+https://github.com/xraisen/ai-code-intelligence-toolkit
+
 Use this section as an installable AI-agent operating contract.
 
 ## Source-of-truth order
@@ -12,13 +18,20 @@ Use this section as an installable AI-agent operating contract.
 
 Do not start with broad repository search unless the graph and symbol contract fail.
 
-## Required commands
+## Required final health gate
 ```bash
-npm run ai:spec -- "task description"
-npm run ai:preflight -- "task description"
+npm run typedoc:health
+npm run typedoc:json:local
+npm run typedoc:check-local
 npm run ai:graph:build
 npm run ai:graph:doctor
 npm run ai:graph:check-leaks
+```
+
+## Required coding commands
+```bash
+npm run ai:spec -- "task description"
+npm run ai:preflight -- "task description"
 npm run ai:graph:query -- "specific symbol, file, route, error, or feature"
 ```
 
