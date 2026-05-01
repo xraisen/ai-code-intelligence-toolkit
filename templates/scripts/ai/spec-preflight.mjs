@@ -1,9 +1,54 @@
 #!/usr/bin/env node
-import fs from "node:fs";
-import path from "node:path";
-const ROOT=process.cwd(); const task=process.argv.slice(2).join(" ").trim()||"inspect task";
-const SOURCE_TRUTH=["AGENTS.md","README.md","AI_GROUND_TRUTH.md","AI_SYMBOL_INDEX.json","docs/ARCHITECTURE.md","documentation/ARCHITECTURE.md","docs/DB.md","documentation/DB.md"];
-function exists(r){return fs.existsSync(path.join(ROOT,r));} function stat(r){try{const s=fs.statSync(path.join(ROOT,r));return{bytes:s.size,mtime:s.mtime.toISOString()};}catch{return null;}}
-function classify(t){if(/auth|rls|payment|security|release|database|schema|migration|infra|deploy|permission|secrets/i.test(t))return"hard";if(/drift|audit|all|runtime|offline|graph|typedoc|api|cross-file|refactor|architecture/i.test(t))return"medium";return"simple";}
-const taskClass=classify(task); const present=SOURCE_TRUTH.filter(exists).map(file=>({file,...stat(file)})); const missing=SOURCE_TRUTH.filter(file=>!exists(file));
-console.log(JSON.stringify({ok:true,task,taskClass,mode:/drift|audit|find|investigate|plan|spec|inspect/i.test(task)?"read_only_spec":"implementation_spec",sourceOfTruth:present,missingSourceOfTruth:missing,graphStatus:exists(".ai/code-graph/graph.json")?"available":"missing_run_npm_run_ai_graph_build",typedocStatus:exists("typedoc-api.json")?"present_use_only_for_regeneration_or_last_resort":"missing_run_npm_run_typedoc_json_local_if_needed",specTemplate:{Task:task,"Source of truth":["user request","AGENTS.md","README.md","AI_GROUND_TRUTH.md","AI_SYMBOL_INDEX.json",".ai/code-graph when healthy"],"Affected symbols":"Resolve through AI_GROUND_TRUTH.md / AI_SYMBOL_INDEX.json before source reads.","Affected files":"Resolve through ai:preflight or ai:graph:query.","Current behavior":"Collect from targeted files only.","Required behavior":"Use task wording and relevant behavior docs.","Patch plan":taskClass==="simple"?"Smallest valid patch after symbol/file resolution.":"Do not patch until allowedPatchFiles are resolved.","Validation plan":["npm run ai:graph:build","npm run ai:graph:doctor","npm run ai:graph:check-leaks","focused tests","typecheck/lint/build as relevant"],"Rollback plan":"Revert only touched files. Do not regenerate generated docs unless required."}},null,2));
+const task = process.argv.slice(2).join(" ").trim();
+const lower = task.toLowerCase();
+const route = lower.includes("typedoc") || lower.includes("docs") || lower.includes("source link")
+  ? "typedoc_tooling"
+  : lower.includes("graph") || lower.includes("graphrag")
+    ? "graphrag_tooling"
+    : "repo_task";
+const taskText = task || "task description";
+console.log(JSON.stringify({
+  ok: true,
+  phase: "ai:spec",
+  task,
+  route,
+  mandatoryFirstRun: "npm run typedoc:json:local && npm run ai:graph:build",
+  contract: [
+    "Before source reads or edits, refresh local TypeDoc JSON and rebuild the graph: npm run typedoc:json:local && npm run ai:graph:build.",
+    "Use AI_GROUND_TRUTH.md as the directory contract and AI_SYMBOL_INDEX.json as the symbol dictionary before touching source files.",
+    "Use ai:graph:query for a specific symbol, route, file, error, feature, table, validator, or hook before opening implementation files.",
+    "Use ai:preflight before patching and patch only files returned by allowedPatchFiles unless a new preflight expands scope.",
+    "On Windows PowerShell, use targeted Select-String lookups for context. Do not use broad Get-Content or rg as the first-pass repo navigation method.",
+    "After any modification, rerun npm run typedoc:json:local && npm run ai:graph:build before the next source-navigation or edit cycle."
+  ],
+  powershellContract: {
+    use: "Select-String -Path '<file>' -Pattern '<specific symbol or phrase>' -SimpleMatch -Context 40,60",
+    avoid: ["Get-Content for broad file dumps", "rg for broad repository search before graph/symbol lookup"],
+    reason: "Select-String keeps reads bounded to the requested symbol or issue and prevents context drift."
+  },
+  examples: [
+    {
+      scenario: "Fix a bug in a known component or function",
+      commands: [
+        "npm run typedoc:json:local && npm run ai:graph:build",
+        `npm run ai:spec -- ${JSON.stringify(taskText)}`,
+        "npm run ai:graph:query -- \"specificFunctionName or src/path/file.ts\"",
+        `npm run ai:preflight -- ${JSON.stringify(taskText)}`
+      ]
+    },
+    {
+      scenario: "Investigate a failing route, hook, validator, table, or API function",
+      commands: [
+        "npm run typedoc:json:local && npm run ai:graph:build",
+        "npm run ai:spec -- \"investigate the failing behavior without editing yet\"",
+        "npm run ai:graph:query -- \"route/hook/validator/table/error text\"",
+        "npm run ai:preflight -- \"prepare the smallest safe patch after graph query\""
+      ]
+    }
+  ],
+  next: [
+    "npm run typedoc:json:local && npm run ai:graph:build",
+    `npm run ai:graph:query -- ${JSON.stringify(task || "specific symbol/file/error/feature")}`,
+    `npm run ai:preflight -- ${JSON.stringify(taskText)}`
+  ]
+}, null, 2));

@@ -1,32 +1,29 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "allowJs": true,
     "checkJs": false,
-    "declaration": false,
-    "emitDeclarationOnly": false,
-    "jsx": "react-jsx",
-    "noEmit": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "bundler"
+    "noEmit": true,
+    "types": []
   },
   "include": [
     "src/**/*",
     "scripts/**/*",
     "mcp/**/*",
-    "types/typedoc-local-shims.d.ts",
-    "vite-env.d.ts"
+    "bin/**/*",
+    "types/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "build",
+    "out",
+    "output",
     "coverage",
-    "docs/api",
-    "public/docs",
-    ".ai/code-graph",
-    "**/*.test.*",
-    "**/*.spec.*"
+    "docs/api*",
+    "public/docs"
   ]
 }

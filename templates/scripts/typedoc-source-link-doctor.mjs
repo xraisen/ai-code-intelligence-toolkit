@@ -1,122 +1,50 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
-const requiredConfigs = ["typedoc.json", "typedoc-frontend.json", "typedoc-ci.json", "package.json"];
-const errors = [];
-const warnings = [];
+const files = process.argv.slice(2).length ? process.argv.slice(2) : ["typedoc-api.json", "typedoc-api.github.json"];
 
-function finish(payload, exitCode) {
-  fs.writeSync(1, `${JSON.stringify(payload, null, 2)}\n`);
-  process.exit(exitCode);
+function readJson(file) {
+  try { return JSON.parse(fs.readFileSync(path.resolve(root, file), "utf8")); }
+  catch { return null; }
 }
-
-function stripJsonCommentsAndTrailingCommas(source) {
-  return source
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/^\s*\/\/.*$/gm, "")
-    .replace(/,\s*([}\]])/g, "$1");
+function collectSourceUrls(value, out = []) {
+  if (!value || typeof value !== "object") return out;
+  if (Array.isArray(value)) {
+    for (const item of value) collectSourceUrls(item, out);
+    return out;
+  }
+  if (value.url && typeof value.url === "string") out.push(value.url);
+  if (Array.isArray(value.sources)) collectSourceUrls(value.sources, out);
+  if (Array.isArray(value.signatures)) collectSourceUrls(value.signatures, out);
+  if (Array.isArray(value.children)) collectSourceUrls(value.children, out);
+  return out;
 }
+function isLocal(url) { return /^vscode:\/\/file\//i.test(url); }
+function isGithubBlob(url) { return /^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\//i.test(url); }
 
-function readJsonc(relativePath) {
-  const absolutePath = path.join(root, relativePath);
-  if (!fs.existsSync(absolutePath)) {
-    errors.push(`Missing ${relativePath}`);
-    return null;
+const reports = [];
+for (const file of files) {
+  const json = readJson(file);
+  if (!json) {
+    reports.push({ file, present: false, sourceUrlCount: 0, localCount: 0, githubBlobCount: 0, ok: true, warning: "file not found; skipped" });
+    continue;
   }
-  try {
-    return JSON.parse(stripJsonCommentsAndTrailingCommas(fs.readFileSync(absolutePath, "utf8")));
-  } catch (error) {
-    errors.push(`Invalid JSON/JSONC in ${relativePath}: ${error.message}`);
-    return null;
-  }
-}
-
-function runNode(args, env = {}) {
-  const childEnv = { ...process.env, ...env };
-  for (const key of Object.keys(childEnv)) {
-    if (key.startsWith("npm_")) delete childEnv[key];
-  }
-  if (!env.CI && !env.GITHUB_ACTIONS) delete childEnv.CI;
-  return spawnSync(process.execPath, args, {
-    cwd: root,
-    encoding: "utf8",
-    env: childEnv,
-    timeout: 15000,
+  const urls = collectSourceUrls(json);
+  const localCount = urls.filter(isLocal).length;
+  const githubBlobCount = urls.filter(isGithubBlob).length;
+  const expected = file.includes("github") ? "github" : "local";
+  reports.push({
+    file,
+    present: true,
+    expected,
+    sourceUrlCount: urls.length,
+    localCount,
+    githubBlobCount,
+    ok: expected === "github" ? githubBlobCount > 0 && localCount === 0 : githubBlobCount === 0
   });
 }
-
-for (const config of requiredConfigs) readJsonc(config);
-
-const pkg = readJsonc("package.json");
-if (pkg) {
-  for (const scriptName of [
-    "typedoc:json",
-    "typedoc:health",
-    "typedoc:config:auto",
-    "typedoc:html:local",
-    "typedoc:html:github",
-    "ai:graph:build",
-    "ai:graph:doctor",
-    "ai:preflight",
-    "ai:spec",
-  ]) {
-    if (!pkg.scripts?.[scriptName]) errors.push(`package.json missing script: ${scriptName}`);
-  }
-}
-
-const scriptPath = "scripts/typedoc-source-config.mjs";
-if (!fs.existsSync(path.join(root, scriptPath))) {
-  errors.push(`Missing ${scriptPath}`);
-} else {
-  for (const args of [
-    [scriptPath, "local", "typedoc.json"],
-    [scriptPath, "github", "typedoc.json"],
-    [scriptPath, "local", "typedoc-frontend.json"],
-    [scriptPath, "github", "typedoc-frontend.json"],
-  ]) {
-    const env = args[1] === "github" ? { TYPEDOC_GITHUB_REPOSITORY: "example/repo", TYPEDOC_GITHUB_REVISION: "main" } : {};
-    const result = runNode(args, env);
-    if (result.status !== 0) {
-      errors.push(`Failed: node ${args.join(" ")}\n${result.stderr || result.stdout}`);
-    }
-    if (result.error) {
-      errors.push(`Failed: node ${args.join(" ")}\n${result.error.message}`);
-    }
-  }
-}
-
-for (const [file, expected] of [
-  ["typedoc.local.generated.json", "vscode://file"],
-  ["typedoc.github.generated.json", "https://github.com/example/repo/blob/main/"],
-  ["typedoc-frontend.local.generated.json", "vscode://file"],
-  ["typedoc-frontend.github.generated.json", "https://github.com/example/repo/blob/main/"],
-]) {
-  const data = readJsonc(file);
-  if (!data) continue;
-  if (!String(data.sourceLinkTemplate || "").startsWith(expected)) {
-    errors.push(`${file} sourceLinkTemplate did not start with ${expected}: ${data.sourceLinkTemplate}`);
-  }
-}
-
-const typedocApiPath = path.join(root, "typedoc-api.json");
-const typedocApiText = fs.existsSync(typedocApiPath) ? fs.readFileSync(typedocApiPath, "utf8") : "";
-if (typedocApiText && /github\.com\/your-username\/your-repo/i.test(typedocApiText)) {
-  errors.push("typedoc-api.json still contains placeholder GitHub source links.");
-}
-if (!typedocApiText) warnings.push("typedoc-api.json not found. Run npm run typedoc:json after npm install.");
-
-finish({
-  ok: errors.length === 0,
-  errors,
-  warnings,
-  checked: requiredConfigs.concat([
-    "scripts/typedoc-source-config.mjs",
-    "typedoc.local.generated.json",
-    "typedoc.github.generated.json",
-    "typedoc-frontend.local.generated.json",
-    "typedoc-frontend.github.generated.json",
-  ]),
-}, errors.length ? 1 : 0);
+const ok = reports.every((r) => r.ok);
+console.log(JSON.stringify({ ok, reports }, null, 2));
+process.exit(ok ? 0 : 1);

@@ -1,37 +1,53 @@
 #!/usr/bin/env node
-import fs from "node:fs";
-import path from "node:path";
-const ROOT = process.cwd();
-const task = process.argv.slice(2).join(" ").trim() || "test";
-const CONTRACT_FILES = ["AGENTS.md", "README.md", "AI_GROUND_TRUTH.md", "AI_SYMBOL_INDEX.json", "docs/ARCHITECTURE.md", "documentation/ARCHITECTURE.md", "docs/DB.md", "documentation/DB.md"];
-const FORBIDDEN_READS = ["node_modules/", ".git/", "dist/", "build/", "coverage/", "docs/api/", "public/docs/", "typedoc-api.json", ".ai/code-graph/"];
-const ABSOLUTE_FORBIDDEN_PATCH_PREFIXES = ["node_modules/", ".git/", ".ai/code-graph/", "typedoc-api.json", "dist/", "build/", "coverage/", "docs/api/", "public/docs/"];
-const ROUTES = [
-  { id: "graphrag_tooling", label: "GraphRAG / code graph tooling", match: /\b(graphrag|code[-\s]?graph|graph\s+doctor|graph\s+builder|graph\s+query|ai:graph|check[-\s]?leaks?|generated\s+paths?|exclude\s+rules?)\b/i, taskClass: "simple", readFiles: ["scripts/graphrag/build-code-graph.mjs", "scripts/graphrag/doctor.mjs", "scripts/graphrag/query-code-graph.mjs", "scripts/graphrag/check-no-leaks.mjs", "scripts/ai/graphrag-script-contract.mjs", "package.json"], patchFiles: ["scripts/graphrag/build-code-graph.mjs", "scripts/graphrag/doctor.mjs", "scripts/graphrag/check-no-leaks.mjs", "scripts/ai/graphrag-script-contract.mjs", "package.json"], validationCommands: ["node --check scripts/graphrag/build-code-graph.mjs", "node --check scripts/graphrag/doctor.mjs", "node --check scripts/graphrag/check-no-leaks.mjs", "npm run ai:graph:build", "npm run ai:graph:doctor", "npm run ai:graph:check-leaks"] },
-  { id: "typedoc_tooling", label: "TypeDoc hybrid local/GitHub source-link tooling", match: /\b(typedoc|sourceLinkTemplate|source[-\s]?link|api\s+docs?|docs\s+source|vscode:\/\/file|github\s+blob|typedoc:doctor|typedoc:health|typedoc:json)\b/i, taskClass: "simple", readFiles: ["typedoc.json", "typedoc-frontend.json", "typedoc-ci.json", "typedoc-strict.json", "tsconfig.doc.json", "scripts/typedoc-source-config.mjs", "scripts/typedoc-source-link-doctor.mjs", "scripts/typedoc-tool-health.mjs", "scripts/ai/typedoc-local-source-check.mjs", "package.json"], patchFiles: ["typedoc.json", "typedoc-frontend.json", "typedoc-ci.json", "typedoc-strict.json", "tsconfig.doc.json", "scripts/typedoc-source-config.mjs", "scripts/typedoc-source-link-doctor.mjs", "scripts/typedoc-tool-health.mjs", "scripts/ai/typedoc-local-source-check.mjs", "package.json"], validationCommands: ["node --check scripts/typedoc-source-config.mjs", "node --check scripts/typedoc-source-link-doctor.mjs", "node --check scripts/typedoc-tool-health.mjs", "node --check scripts/ai/typedoc-local-source-check.mjs", "npm run typedoc:health", "npm run typedoc:doctor"] },
-  { id: "package_scripts", label: "package scripts / npm tooling", match: /\b(package\.json|npm\s+script|package\s+script|install\s+script|installer|bin)\b/i, taskClass: "simple", readFiles: ["package.json"], patchFiles: ["package.json"], validationCommands: ["node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\""] },
-  { id: "react_frontend", label: "React/front-end surface", match: /\b(react|component|hook|page|route|context|frontend|ui|tsx)\b/i, taskClass: "medium", readFiles: ["src/"], patchFiles: ["src/"], validationCommands: ["npm run typecheck", "npm run lint"] },
-  { id: "backend_api", label: "backend/API surface", match: /\b(api|server|backend|edge\s+function|handler|webhook|controller|service)\b/i, taskClass: "medium", readFiles: ["src/", "server/", "api/", "supabase/functions/"], patchFiles: ["src/", "server/", "api/", "supabase/functions/"], validationCommands: ["npm run typecheck", "npm test"] },
-  { id: "database", label: "database/schema/query surface", match: /\b(database|schema|migration|sql|table|rpc|rls|postgres|supabase)\b/i, taskClass: "hard", readFiles: ["supabase/", "db/", "database/", "prisma/", "drizzle/", "src/"], patchFiles: ["supabase/", "db/", "database/", "prisma/", "drizzle/", "src/"], validationCommands: ["npm run typecheck", "npm test"] },
-  { id: "tests", label: "tests/validators", match: /\b(test|vitest|jest|playwright|validator|smoke|e2e|spec)\b/i, taskClass: "medium", readFiles: ["tests/", "src/", "scripts/validation/"], patchFiles: ["tests/", "src/", "scripts/validation/"], validationCommands: ["npm test"] }
-];
-function normalize(v) { return String(v || "").replaceAll("\\", "/").replace(/^\.\//, ""); }
-function exists(r) { return fs.existsSync(path.join(ROOT, r)); }
-function isForbidden(r) { const n = normalize(r); return FORBIDDEN_READS.some((x) => n === x || n.startsWith(x)); }
-function isForbiddenPatch(r) { const n = normalize(r); return ABSOLUTE_FORBIDDEN_PATCH_PREFIXES.some((x) => n === x || n.startsWith(x)); }
-function safeRead(r, max = 300000) { try { const p = path.join(ROOT, r); const s = fs.statSync(p); if (s.size > max) return ""; return fs.readFileSync(p, "utf8"); } catch { return ""; } }
-function unique(v) { return [...new Set(v.filter(Boolean))]; }
-function classify(t) { if (/auth|security|payment|database|schema|migration|release|deploy|permissions/i.test(t)) return "hard"; if (/cross-file|refactor|runtime|typedoc|graph|audit|drift/i.test(t)) return "medium"; return "simple"; }
-function searchFile(file, terms) { const text = safeRead(file); if (!text) return []; const lines = text.split(/\r?\n/); const out = []; for (let i = 0; i < lines.length; i += 1) { const l = lines[i].toLowerCase(); if (terms.some((t) => t.length > 2 && l.includes(t.toLowerCase()))) out.push({ file, line: i + 1, text: lines[i].slice(0, 240) }); if (out.length >= 20) break; } return out; }
-function readCommands(files) { return files.map((f) => `Get-Content -Path "${f}" | Select-Object -Skip 0 -First 120`); }
-const route = ROUTES.find((r) => r.match.test(task));
-const searchTerms = unique(task.split(/[^A-Za-z0-9_:/.-]+/).filter((x) => x.length > 2)).slice(0, 20);
-const contractMatches = CONTRACT_FILES.filter(exists).flatMap((file) => searchFile(file, searchTerms)).slice(0, 30);
-const graphAvailable = exists(".ai/code-graph/graph.json");
-const baseRead = CONTRACT_FILES.filter(exists).filter((f) => !isForbidden(f));
-const routeRead = (route?.readFiles || []).filter((f) => exists(f) || f.endsWith("/"));
-const routePatch = (route?.patchFiles || []).filter((f) => !isForbiddenPatch(f));
-const allowedReadFiles = unique([...baseRead, ...routeRead, graphAvailable ? ".ai/code-graph/graph.json" : null]);
-const readOnlyFiles = unique([...baseRead, graphAvailable ? ".ai/code-graph/graph.json" : null]);
-const allowedPatchFiles = unique(routePatch);
-console.log(JSON.stringify({ ok: true, task, taskClass: route?.taskClass || classify(task), route: route ? { id: route.id, label: route.label } : null, sourceOfTruthOrder: ["AGENTS.md", "README.md", "AI_GROUND_TRUTH.md", "AI_SYMBOL_INDEX.json", ".ai/code-graph/graph.json when available", "targeted source window"], graphAvailable, searchTerms, contractMatches, spec: { allowedReadFiles, readOnlyFiles, allowedPatchFiles, targetFiles: unique(routeRead), forbiddenPatchHints: ["node_modules/**", "dist/**", "build/**", "generated docs/**", "files outside allowedPatchFiles"], readCommands: readCommands(unique(routeRead)), validationCommands: route?.validationCommands || ["npm run typecheck", "npm test"], nextAction: allowedPatchFiles.length ? "Read only targeted files and patch smallest scope." : "No deterministic patch file resolved. Use ai:graph:query with a specific symbol/file/error before editing." } }, null, 2));
+const task = process.argv.slice(2).join(" ").trim();
+const q = task.toLowerCase();
+function includesAny(words){ return words.some((w) => q.includes(w)); }
+let route = "application_code";
+let allowedReadFiles = ["AGENTS.md", "README.md", "AI_GROUND_TRUTH.md", "AI_SYMBOL_INDEX.json", ".ai/code-graph/graph.json"];
+let allowedPatchFiles = [];
+let validationCommands = ["npm run typedoc:json:local && npm run ai:graph:build", "npm run ai:graph:doctor", "npm run ai:graph:check-leaks"];
+if (includesAny(["typedoc", "source link", "docs", "documentation"])) {
+  route = "typedoc_tooling";
+  allowedPatchFiles = ["scripts/typedoc-source-config.mjs", "scripts/typedoc-source-link-doctor.mjs", "scripts/typedoc-tool-health.mjs", "scripts/ai/typedoc-local-source-check.mjs", "typedoc.json", "typedoc-frontend.json", "typedoc-ci.json", "typedoc-strict.json", "tsconfig.doc.json", "types/typedoc-local-shims.d.ts", "README.md", "AGENTS.md"];
+  validationCommands = ["npm run typedoc:health", "npm run typedoc:json:local", "npm run typedoc:check-local", "npm run ai:graph:build", "npm run ai:graph:doctor"];
+} else if (includesAny(["graph", "graphrag", "preflight", "leak", "ai:spec", "ai:preflight", "select-string", "select string", "ground truth", "symbol index"])) {
+  route = "graphrag_tooling";
+  allowedPatchFiles = ["scripts/graphrag/build-code-graph.mjs", "scripts/graphrag/query-code-graph.mjs", "scripts/graphrag/doctor.mjs", "scripts/graphrag/check-no-leaks.mjs", "scripts/ai/spec-preflight.mjs", "scripts/ai/codex-preflight.mjs", "scripts/ai/graphrag-script-contract.mjs", "mcp/codebase-intelligence-server.mjs", "README.md", "AGENTS.md", "AI_GROUND_TRUTH.md", "AI_SYMBOL_INDEX.json"];
+  validationCommands = ["npm run typedoc:json:local && npm run ai:graph:build", "npm run ai:graph:doctor", "npm run ai:graph:check-leaks"];
+} else {
+  allowedPatchFiles = [];
+  validationCommands = ["npm run typedoc:json:local && npm run ai:graph:build", "npm run ai:graph:query -- " + JSON.stringify(task || "specific symbol/file/error/feature"), "run project-specific tests after graph query identifies files"];
+}
+console.log(JSON.stringify({
+  ok: true,
+  phase: "ai:preflight",
+  task,
+  route,
+  mandatoryBeforeAnyEdit: [
+    "npm run typedoc:json:local && npm run ai:graph:build",
+    "npm run ai:spec -- " + JSON.stringify(task || "task description"),
+    "npm run ai:graph:query -- " + JSON.stringify(task || "specific symbol/file/error/feature"),
+    "npm run ai:preflight -- " + JSON.stringify(task || "task description")
+  ],
+  allowedReadFiles,
+  allowedPatchFiles,
+  validationCommands,
+  navigationContract: [
+    "Treat AI_GROUND_TRUTH.md as the directory map for approved symbols, scripts, files, and contracts.",
+    "Treat AI_SYMBOL_INDEX.json as the dictionary for symbol-to-path lookup.",
+    "Use .ai/code-graph/graph.json only after it has been rebuilt in the current edit cycle.",
+    "Locate files through ground truth, symbol index, and ai:graph:query before touching implementation files."
+  ],
+  powershellContract: {
+    requiredContextCommand: "Select-String -Path '<file>' -Pattern '<symbol or exact phrase>' -SimpleMatch -Context 40,60",
+    forbiddenFirstPassCommands: ["Get-Content", "rg"],
+    allowedException: "Use another command only after ai:graph:query returns an exact file and Select-String cannot expose the needed bounded context."
+  },
+  stopRules: [
+    "Do not broad-search first.",
+    "Do not patch files outside allowedPatchFiles without a new preflight.",
+    "Do not treat generated files as source truth.",
+    "Do not use Get-Content or rg as the first repo-navigation move in PowerShell.",
+    "After modifications, rebuild TypeDoc local JSON and the graph before another edit cycle."
+  ]
+}, null, 2));

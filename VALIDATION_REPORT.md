@@ -1,42 +1,27 @@
-# Validation Report — v1.0.2
+# Validation Report v1.0.6 revised
 
-Validated package health checks performed in the packaging environment.
+## Result
 
-## Scope
+PASS for package-level validation performed in this environment.
 
-- README updated with evidence-safe benchmark wording.
-- Product names use actual names only.
-- Claims limited to Codex CLI and Codex Windows app workflow.
-- Trademark/affiliation notice added.
-- Benchmark images regenerated without vendor logos.
-- Old duplicate benchmark image filenames removed.
-- Token/cost positioning corrected: precision first; lower exposure is a side effect.
+## AI Code Intelligence Toolkit checks
 
-## Packaged images
+- Manual `node --check` passed for all package `.mjs` files.
+- `ai:spec` outputs the mandatory `npm run typedoc:json:local && npm run ai:graph:build` startup contract.
+- `ai:preflight` outputs the mandatory before-edit contract, allowed read files, allowed patch files, validation commands, stop rules, and PowerShell contract.
+- `ai:graph:query` returns PowerShell `Select-String` bounded context commands instead of broad `Get-Content` commands.
+- `AI_GROUND_TRUTH.md`, `AI_SYMBOL_INDEX.json`, README section, and AGENTS snippet include the anti-drift contract.
+- `.tgz` package artifact was recreated with standard `package/` tarball prefix.
 
-- `docs/assets/codex-windows-tested-benchmark.png`
-- `docs/assets/precision-workflow-diagram.png`
+## Scope note
 
+This is package-health validation. A target project still needs its own final gate after install:
 
-## Automated validation
-
-FAILED
-
-- README.md: contains banned wording official OpenAI
-
-## Automated validation
-
-FAILED
-
-- README.md: contains banned wording official OpenAI
-
-## Automated validation v1.0.2 final
-
-PASS
-
-- README wording check: PASS
-- Image path check: PASS
-- package.json parse: PASS
-- benchmark.json parse: PASS
-- node --check all `.mjs` files: PASS
-- npm run smoke: PASS
+```bash
+npm run typedoc:health
+npm run typedoc:json:local
+npm run typedoc:check-local
+npm run ai:graph:build
+npm run ai:graph:doctor
+npm run ai:graph:check-leaks
+```

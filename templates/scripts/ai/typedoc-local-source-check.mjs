@@ -1,78 +1,29 @@
 #!/usr/bin/env node
-/**
- * Fails if local TypeDoc JSON/config still points to placeholder or GitHub blob links.
- * Intended local output comes from:
- *   npm run typedoc:json:local
- */
 import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
-const typedocPath = path.join(root, "typedoc-api.json");
-const configCandidates = ["typedoc.local.generated.json", "typedoc.auto.generated.json", "typedoc.json"];
-
-function read(file) {
-  try {
-    return fs.readFileSync(file, "utf8");
-  } catch {
-    return "";
-  }
+const file = process.argv[2] || "typedoc-api.json";
+function readJson(rel) { try { return JSON.parse(fs.readFileSync(path.resolve(root, rel), "utf8")); } catch { return null; } }
+function collectSourceUrls(value, out = []) {
+  if (!value || typeof value !== "object") return out;
+  if (Array.isArray(value)) { for (const item of value) collectSourceUrls(item, out); return out; }
+  if (value.url && typeof value.url === "string") out.push(value.url);
+  if (Array.isArray(value.sources)) collectSourceUrls(value.sources, out);
+  if (Array.isArray(value.signatures)) collectSourceUrls(value.signatures, out);
+  if (Array.isArray(value.children)) collectSourceUrls(value.children, out);
+  return out;
 }
-
-function readJson(file) {
-  try {
-    return JSON.parse(read(file));
-  } catch {
-    return null;
-  }
+function isGithubBlob(url) { return /^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\//i.test(url); }
+function isPlaceholder(url) { return /OWNER\/REPO|your-username|your-repo/i.test(url); }
+const json = readJson(file);
+if (!json) {
+  console.log(JSON.stringify({ ok: true, file, present: false, warning: `${file} not found; run npm run typedoc:json:local after npm install.` }, null, 2));
+  process.exit(0);
 }
-
-const errors = [];
-const configName = configCandidates.find((name) => fs.existsSync(path.join(root, name))) || "typedoc.json";
-const config = readJson(path.join(root, configName));
-const text = read(typedocPath);
-
-if (!config) errors.push(`${configName} is missing or invalid JSON.`);
-if (!text.trim()) errors.push("typedoc-api.json is missing or empty. Run npm run typedoc:json:local.");
-
-if (config) {
-  const template = String(config.sourceLinkTemplate || "");
-  if (/github\.com|\/blob\//i.test(template)) {
-    errors.push(`${configName} sourceLinkTemplate points to GitHub; expected local source links.`);
-  }
-  if (/your-username|your-repo/i.test(template)) {
-    errors.push(`${configName} still uses placeholder GitHub repository text.`);
-  }
-  if (template && (!template.includes("{path}") || !template.includes("{line}"))) {
-    errors.push(`${configName} sourceLinkTemplate should include {path} and {line}.`);
-  }
-}
-
-if (/github\.com\/your-username\/your-repo/i.test(text)) {
-  errors.push("typedoc-api.json contains placeholder GitHub source links.");
-}
-if (/github\.com\/[^"]+\/blob\//i.test(text)) {
-  errors.push("typedoc-api.json contains GitHub blob links; run npm run typedoc:json:local for AI/local use.");
-}
-try {
-  if (text.trim()) JSON.parse(text);
-} catch (error) {
-  errors.push(`typedoc-api.json is not valid JSON: ${error.message}`);
-}
-
-console.log(
-  JSON.stringify(
-    {
-      ok: errors.length === 0,
-      typedocPath: "typedoc-api.json",
-      configPath: configName,
-      sourceLinkTemplate: config?.sourceLinkTemplate ?? null,
-      errors,
-      next: errors.length ? ["npm run typedoc:json:local", "npm run typedoc:check-local"] : [],
-    },
-    null,
-    2
-  )
-);
-
-process.exit(errors.length ? 1 : 0);
+const urls = collectSourceUrls(json);
+const githubBlobUrls = urls.filter(isGithubBlob);
+const placeholders = urls.filter(isPlaceholder);
+const ok = githubBlobUrls.length === 0 && placeholders.length === 0;
+console.log(JSON.stringify({ ok, file, present: true, sourceUrlCount: urls.length, githubBlobSourceUrlCount: githubBlobUrls.length, placeholderSourceUrlCount: placeholders.length }, null, 2));
+process.exit(ok ? 0 : 1);

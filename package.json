@@ -1,47 +1,51 @@
 {
   "name": "ai-code-intelligence-toolkit",
-  "version": "1.0.2",
-  "description": "Codex-compatible local code intelligence toolkit with GraphRAG-style repo graph, smart preflight patch scoping, generated-file leak checks, and AGENTS.md workflow guardrails. Tested with Codex CLI and Codex Windows app workflow.",
+  "version": "1.0.6",
+  "description": "Codex-compatible AI code intelligence toolkit with local graph, preflight, leak checks, and TypeDoc source-link support.",
   "type": "module",
-  "license": "MIT",
+  "main": "index.js",
   "bin": {
     "ai-code-intel-install": "./bin/install.mjs"
   },
+  "files": [
+    "bin",
+    "templates",
+    "scripts",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "index.js",
+    "benchmark.json",
+    "PATCH_NOTES_v1.0.6.md",
+    "VALIDATION_REPORT.md"
+  ],
   "scripts": {
-    "install:toolkit": "node bin/install.mjs",
-    "smoke": "node bin/smoke-test.mjs"
+    "node-check": "node scripts/package-node-check.mjs",
+    "smoke": "node scripts/package-node-check.mjs",
+    "pack:dry": "npm pack --dry-run"
   },
   "keywords": [
+    "ai",
     "codex",
-    "agents-md",
-    "ai-coding-agent",
     "graphrag",
-    "code-intelligence",
-    "mcp",
-    "typescript",
-    "developer-tools",
-    "preflight",
-    "repo-analysis"
+    "typedoc",
+    "source-links",
+    "preflight"
   ],
-  "files": [
-    "LICENSE",
-    "README.md",
-    "TRADEMARKS.md",
-    "VALIDATION_REPORT.md",
-    "benchmark.json",
-    "bin",
-    "docs",
-    "templates"
-  ],
-  "engines": {
-    "node": ">=20"
-  },
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xraisen/ai-code-intelligence-toolkit.git"
   },
-  "bugs": {
-    "url": "https://github.com/xraisen/ai-code-intelligence-toolkit/issues"
+  "engines": {
+    "node": ">=20"
   },
-  "homepage": "https://github.com/xraisen/ai-code-intelligence-toolkit#readme"
+  "peerDependencies": {
+    "typedoc": ">=0.25"
+  },
+  "peerDependenciesMeta": {
+    "typedoc": {
+      "optional": true
+    }
+  }
 }

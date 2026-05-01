@@ -1,2 +1,8 @@
-// Local TypeDoc compatibility shims. Safe to keep empty.
-export {};
+declare module "*.css";
+declare module "*.scss";
+declare module "*.svg";
+declare module "*.png";
+declare module "*.jpg";
+declare module "*.jpeg";
+declare module "*.webp";
+declare module "*.json";

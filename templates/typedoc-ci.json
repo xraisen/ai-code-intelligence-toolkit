@@ -1,41 +1,6 @@
 {
-  "$schema": "https://typedoc.org/schema.json",
-  "tsconfig": "./tsconfig.doc.json",
-  "entryPoints": [
-    "src"
+  "extends": [
+    "./typedoc.json"
   ],
-  "entryPointStrategy": "expand",
-  "exclude": [
-    "**/__tests__/**",
-    "**/__mocks__/**",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/node_modules/**",
-    "node_modules/**",
-    "dist/**",
-    "build/**",
-    "coverage/**",
-    "docs/**",
-    "public/docs/**",
-    ".ai/code-graph/**"
-  ],
-  "excludePrivate": true,
-  "excludeProtected": false,
-  "excludeInternal": true,
-  "compilerOptions": {
-    "skipLibCheck": true,
-    "allowJs": true,
-    "noImplicitAny": false,
-    "skipDefaultLibCheck": true
-  },
-  "skipErrorChecking": true,
-  "validation": {
-    "notExported": false,
-    "invalidLink": false
-  },
-  "logLevel": "Error",
-  "disableSources": false,
-  "sourceLinkTemplate": "{path}#L{line}"
+  "skipErrorChecking": true
 }

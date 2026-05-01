@@ -1,0 +1,57 @@
+{
+  "version": "1.0.6",
+  "symbols": [
+    {
+      "name": "ai:spec",
+      "path": "scripts/ai/spec-preflight.mjs",
+      "kind": "script"
+    },
+    {
+      "name": "ai:preflight",
+      "path": "scripts/ai/codex-preflight.mjs",
+      "kind": "script"
+    },
+    {
+      "name": "ai:graph:build",
+      "path": "scripts/graphrag/build-code-graph.mjs",
+      "kind": "script"
+    },
+    {
+      "name": "ai:graph:query",
+      "path": "scripts/graphrag/query-code-graph.mjs",
+      "kind": "script"
+    },
+    {
+      "name": "ai:graph:doctor",
+      "path": "scripts/graphrag/doctor.mjs",
+      "kind": "script"
+    },
+    {
+      "name": "ai:graph:check-leaks",
+      "path": "scripts/graphrag/check-no-leaks.mjs",
+      "kind": "script"
+    },
+    {
+      "name": "typedoc:json:local",
+      "path": "scripts/typedoc-source-config.mjs",
+      "kind": "script",
+      "contract": "generate local TypeDoc JSON before graph build"
+    },
+    {
+      "name": "Select-String context contract",
+      "path": "AI_GROUND_TRUTH.md",
+      "kind": "contract",
+      "contract": "use targeted PowerShell Select-String before source edits"
+    },
+    {
+      "name": "AI_GROUND_TRUTH.md",
+      "path": "AI_GROUND_TRUTH.md",
+      "kind": "source_truth"
+    },
+    {
+      "name": "AI_SYMBOL_INDEX.json",
+      "path": "AI_SYMBOL_INDEX.json",
+      "kind": "symbol_dictionary"
+    }
+  ]
+}
