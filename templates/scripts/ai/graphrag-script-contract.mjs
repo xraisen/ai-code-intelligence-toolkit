@@ -73,7 +73,11 @@ export const DEFAULT_SCRIPT_MAP = Object.freeze({
   "typedoc:doctor": "node scripts/typedoc-tool-health.mjs",
   "typedoc:check-local": "node scripts/ai/typedoc-local-source-check.mjs",
   "typedoc:strict": "TYPEDOC_STRICT=true npx --no-install typedoc --options typedoc-strict.json",
+<<<<<<< HEAD
   "docs:typedoc": "npm run typedoc:html:auto",
   "ai:final-health": "npm run typedoc:health && npm run typedoc:json:local && npm run typedoc:check-local && npm run ai:graph:build && npm run ai:graph:doctor && npm run ai:graph:check-leaks",
   "toolkit:final-health": "npm run ai:final-health"
+=======
+  "docs:typedoc": "npm run typedoc:html:auto"
+>>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
 });

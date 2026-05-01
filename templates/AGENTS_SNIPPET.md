@@ -6,6 +6,7 @@ https://github.com/xraisen/typedoc-hybrid-source-links
 This repository/tool:
 https://github.com/xraisen/ai-code-intelligence-toolkit
 
+<<<<<<< HEAD
 ## Non-negotiable anti-drift startup
 
 Before reading implementation files, planning a patch, or editing source code, run and wait for this command to finish:
@@ -23,6 +24,9 @@ npm run ai:preflight -- "<task>"
 ```
 
 Do not touch source files until the specific files and symbols are located.
+=======
+Use this section as an installable AI-agent operating contract.
+>>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
 
 ## Source-of-truth order
 
@@ -35,6 +39,7 @@ Do not touch source files until the specific files and symbols are located.
 
 Do not start with broad repository search unless the graph and symbol contract fail.
 
+<<<<<<< HEAD
 ## PowerShell context contract
 
 When working in PowerShell, use targeted `Select-String` context reads before source edits:
@@ -48,6 +53,9 @@ Do not use broad `Get-Content` file dumps or `rg` as the first navigation move. 
 
 ## Required final health gate
 
+=======
+## Required final health gate
+>>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
 ```bash
 npm run typedoc:health
 npm run typedoc:json:local
@@ -55,6 +63,16 @@ npm run typedoc:check-local
 npm run ai:graph:build
 npm run ai:graph:doctor
 npm run ai:graph:check-leaks
+<<<<<<< HEAD
+=======
+```
+
+## Required coding commands
+```bash
+npm run ai:spec -- "task description"
+npm run ai:preflight -- "task description"
+npm run ai:graph:query -- "specific symbol, file, route, error, or feature"
+>>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
 ```
 
 If modifications are made, rerun:

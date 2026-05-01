@@ -17,6 +17,7 @@ npx typedoc-hybrid-install --target . --overwrite
 npx ai-code-intel-install --target . --overwrite
 ```
 
+<<<<<<< HEAD
 ### Mandatory anti-drift startup
 
 Before reading implementation files or editing source code, always run and wait for this to finish:
@@ -75,6 +76,8 @@ npm run ai:graph:query -- "query-code-graph readCommands"
 npm run ai:preflight -- "fix graph query returning broad file dumps"
 ```
 
+=======
+>>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
 ### Final health gate
 
 ```bash
@@ -86,6 +89,7 @@ npm run ai:graph:doctor
 npm run ai:graph:check-leaks
 ```
 
+<<<<<<< HEAD
 After modifications, rerun:
 
 ```bash
@@ -93,3 +97,16 @@ npm run typedoc:json:local && npm run ai:graph:build
 ```
 
 Then rerun `ai:spec`, `ai:graph:query`, and `ai:preflight` before the next edit cycle.
+=======
+### Working loop
+
+1. Run `npm run ai:graph:doctor` to confirm the local graph and required files are healthy.
+2. Run `npm run ai:preflight -- "describe the work"` to get a bounded patch plan and validation commands.
+3. Use `npm run ai:graph:query -- "symbol or feature name"` to locate the right files before editing.
+4. Apply the smallest possible change and validate using the commands returned by preflight.
+5. Finish with `npm run ai:graph:check-leaks` to keep generated output out of source files.
+
+### Tested positioning
+
+Tested with Codex CLI and Codex Windows app workflow. Other assistants may run the same npm scripts, but this release is not claiming all assistants are tested.
+>>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138

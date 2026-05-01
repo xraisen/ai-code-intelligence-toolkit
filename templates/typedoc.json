@@ -1,9 +1,43 @@
 {
   "entryPoints": [
-    "src"
+    "src",
+    "scripts",
+    "bin",
+    "mcp"
   ],
   "out": "docs/api",
+<<<<<<< HEAD
   "excludePrivate": true,
   "excludeInternal": true,
   "skipErrorChecking": true
+=======
+  "name": "Project API Documentation",
+  "includeVersion": true,
+  "readme": "README.md",
+  "tsconfig": "./tsconfig.doc.json",
+  "excludeNotDocumentedKinds": [],
+  "excludeExternals": true,
+  "exclude": [
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/node_modules/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "docs/**",
+    "public/docs/**",
+    ".ai/code-graph/**"
+  ],
+  "disableSources": false,
+  "sourceLinkTemplate": "{path}#L{line}",
+  "sidebarLinks": {
+    "Documentation": "/docs/",
+    "API Dictionary": "/docs/api/"
+  }
+>>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
 }
