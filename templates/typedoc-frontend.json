@@ -1,9 +1,14 @@
 {
   "entryPoints": [
-    "src"
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ],
+  "entryPointStrategy": "expand",
+  "tsconfig": "tsconfig.doc.json",
   "out": "docs/api-frontend",
   "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
   "excludeInternal": true,
   "skipErrorChecking": true
 }

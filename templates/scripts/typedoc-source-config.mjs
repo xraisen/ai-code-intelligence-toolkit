@@ -19,6 +19,9 @@ function run(cmd, args) {
   catch { return ""; }
 }
 function normalizeSlash(value) { return String(value || "").replace(/\\/g, "/"); }
+function existsDir(dir) { return fs.existsSync(path.resolve(root, dir)) && fs.statSync(path.resolve(root, dir)).isDirectory(); }
+function unique(values) { return Array.from(new Set(values.filter(Boolean))); }
+
 function repoSlugFromPackage() {
   const pkg = readJson("package.json", {});
   const raw = typeof pkg.repository === "string" ? pkg.repository : pkg.repository?.url;
@@ -35,16 +38,38 @@ function repoUrl() {
 function revision() {
   return process.env.TYPEDOC_GITHUB_REVISION || process.env.GITHUB_SHA || run("git", ["rev-parse", "HEAD"]) || "main";
 }
+
 function inferEntryPoints(config) {
-  if (Array.isArray(config.entryPoints) && config.entryPoints.length) return { changed: false, entryPoints: config.entryPoints, fallbackUsed: false };
-  const candidates = ["src", "scripts", "mcp", "bin", "lib", "app", "pages", "components"].filter((p) => fs.existsSync(path.resolve(root, p)));
-  return { changed: true, entryPoints: candidates.length ? candidates : ["."], fallbackUsed: true };
+  const existing = Array.isArray(config.entryPoints)
+    ? config.entryPoints.map((value) => String(value).trim()).filter(Boolean)
+    : [];
+  if (existing.length) {
+    return { changed: false, entryPoints: existing, fallbackUsed: false, reason: "preserved-config-entryPoints" };
+  }
+
+  const candidates = [];
+  if (existsDir("src")) candidates.push("src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx");
+  if (existsDir("api")) candidates.push("api/**/*.ts", "api/**/*.tsx", "api/**/*.mts", "api/**/*.mjs", "api/**/*.js");
+  if (existsDir("scripts")) candidates.push("scripts/**/*.ts", "scripts/**/*.mts", "scripts/**/*.mjs", "scripts/**/*.js");
+  if (existsDir("mcp")) candidates.push("mcp/**/*.ts", "mcp/**/*.mts", "mcp/**/*.mjs", "mcp/**/*.js");
+  if (existsDir("bin")) candidates.push("bin/**/*.ts", "bin/**/*.mts", "bin/**/*.mjs", "bin/**/*.js");
+  for (const dir of ["lib", "app", "pages", "components", "types"]) {
+    if (existsDir(dir)) candidates.push(`${dir}/**/*.ts`, `${dir}/**/*.tsx`, `${dir}/**/*.js`, `${dir}/**/*.jsx`);
+  }
+
+  return {
+    changed: true,
+    entryPoints: unique(candidates.length ? candidates : ["**/*.{ts,tsx,mts,mjs,js,jsx}"]),
+    fallbackUsed: true,
+    reason: "inferred-glob-entryPoints"
+  };
 }
 function defaultExclude() {
   return [
     "**/node_modules/**", "**/.git/**", "**/dist/**", "**/build/**", "**/out/**", "**/output/**",
     "**/.next/**", "**/.nuxt/**", "**/coverage/**", "**/docs/api*/**", "**/public/docs/**",
     "**/android/app/src/main/assets/public/**", "**/ios/App/App/public/**", "**/*generated*", "**/*.generated.*",
+    "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx",
     "**/typedoc-api*.json", "**/package-lock.json", "**/pnpm-lock.yaml", "**/yarn.lock", "**/bun.lockb"
   ];
 }
@@ -71,7 +96,9 @@ const sourceLinkTemplate = selectedMode === "local"
 const generated = {
   ...input,
   entryPoints: entryPointNormalization.entryPoints,
-  exclude: Array.from(new Set([...(Array.isArray(input.exclude) ? input.exclude : []), ...defaultExclude()])),
+  entryPointStrategy: input.entryPointStrategy || "expand",
+  tsconfig: input.tsconfig || "tsconfig.doc.json",
+  exclude: unique([...(Array.isArray(input.exclude) ? input.exclude : []), ...defaultExclude()]),
   sourceLinkTemplate,
   out: selectedMode === "github" ? publicOutDir(inputConfig) : localOutDir(inputConfig),
   skipErrorChecking: input.skipErrorChecking ?? true
@@ -86,6 +113,8 @@ console.log(JSON.stringify({
   input: inputConfig,
   output,
   outDir: generated.out,
+  tsconfig: generated.tsconfig,
+  entryPointStrategy: generated.entryPointStrategy,
   skipErrorChecking: generated.skipErrorChecking,
   sourceLinkTemplate,
   excludeCount: generated.exclude.length,

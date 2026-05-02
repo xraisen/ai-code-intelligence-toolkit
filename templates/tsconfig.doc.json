@@ -5,16 +5,34 @@
     "moduleResolution": "Bundler",
     "allowJs": true,
     "checkJs": false,
+    "jsx": "react-jsx",
     "skipLibCheck": true,
     "noEmit": true,
     "types": []
   },
   "include": [
-    "src/**/*",
-    "scripts/**/*",
-    "mcp/**/*",
-    "bin/**/*",
-    "types/**/*"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "api/**/*.ts",
+    "api/**/*.tsx",
+    "api/**/*.mts",
+    "api/**/*.mjs",
+    "api/**/*.js",
+    "scripts/**/*.ts",
+    "scripts/**/*.mts",
+    "scripts/**/*.mjs",
+    "scripts/**/*.js",
+    "mcp/**/*.ts",
+    "mcp/**/*.mts",
+    "mcp/**/*.mjs",
+    "mcp/**/*.js",
+    "bin/**/*.ts",
+    "bin/**/*.mts",
+    "bin/**/*.mjs",
+    "bin/**/*.js",
+    "types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
@@ -24,6 +42,11 @@
     "output",
     "coverage",
     "docs/api*",
-    "public/docs"
+    "public/docs",
+    ".ai",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
   ]
 }

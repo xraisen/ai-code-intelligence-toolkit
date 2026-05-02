@@ -49,3 +49,9 @@ npm run ai:final-health
 ## Publish order
 
 Publish `typedoc-hybrid-source-links` first, then `ai-code-intelligence-toolkit`.
+
+## TypeDoc entrypoint compatibility patch
+
+- Preserves explicit TypeDoc glob entry points.
+- Adds `entryPointStrategy: "expand"` and `tsconfig: "tsconfig.doc.json"` to generated configs.
+- Uses glob fallbacks instead of bare directory fallbacks to support Vite/React/TypeScript project-reference layouts.

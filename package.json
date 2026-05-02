@@ -1,11 +1,11 @@
 {
   "name": "ai-code-intelligence-toolkit",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "AI code intelligence toolkit with anti-drift task contracts, graph queries, TypeDoc source-link support, and agent-safe install injection.",
   "type": "module",
   "main": "index.js",
   "bin": {
-    "ai-code-intel-install": "./bin/install.mjs"
+    "ai-code-intel-install": "bin/install.mjs"
   },
   "files": [
     "bin",
@@ -21,7 +21,8 @@
     "PATCH_NOTES_v1.0.7.md",
     "PATCH_NOTES_v1.0.8.md",
     "PATCH_NOTES_v1.0.8_FINAL_DRIFT_HARDENED.md",
-    "PATCH_ROLLUP_v1.0.8_CUMULATIVE.md"
+    "PATCH_ROLLUP_v1.0.8_CUMULATIVE.md",
+    "PATCH_NOTES_v1.0.8_TYPEDOC_ENTRYPOINT_FIX.md"
   ],
   "scripts": {
     "node-check": "node scripts/package-node-check.mjs",
