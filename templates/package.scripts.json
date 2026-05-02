@@ -1,4 +1,6 @@
 {
+  "ai:inject-contract": "node scripts/ai/inject-agent-contract.mjs --target . --strict",
+  "ai:repair-contract": "node scripts/ai/inject-agent-contract.mjs --target .",
   "ai:spec": "node scripts/ai/spec-preflight.mjs",
   "ai:preflight": "node scripts/ai/codex-preflight.mjs",
   "ai:graph:build": "node scripts/graphrag/build-code-graph.mjs --fast",
@@ -26,17 +28,31 @@
   "typedoc:health": "node scripts/typedoc-tool-health.mjs",
   "typedoc:doctor": "node scripts/typedoc-tool-health.mjs",
   "typedoc:check-local": "node scripts/ai/typedoc-local-source-check.mjs",
-<<<<<<< HEAD
-  "typedoc:strict": "TYPEDOC_STRICT=true npx --no-install typedoc --options typedoc-strict.json",
+  "typedoc:strict": "node scripts/typedoc-strict-runner.mjs",
   "docs:typedoc": "npm run typedoc:html:auto",
   "typedoc:final-health": "npm run typedoc:health && npm run typedoc:json:local && npm run typedoc:check-local",
-  "ai:final-health": "npm run typedoc:health && npm run typedoc:json:local && npm run typedoc:check-local && npm run ai:graph:build && npm run ai:graph:doctor && npm run ai:graph:check-leaks",
-  "toolkit:final-health": "npm run ai:final-health"
-=======
-  "typedoc:strict": "npx --no-install typedoc --options typedoc-strict.json",
-  "docs:typedoc": "npm run typedoc:html:auto",
-  "typedoc:final-health": "npm run typedoc:health && npm run typedoc:json:local && npm run typedoc:check-local",
-  "ai:final-health": "npm run typedoc:health && npm run typedoc:json:local && npm run typedoc:check-local && npm run ai:graph:build && npm run ai:graph:doctor && npm run ai:graph:check-leaks",
-  "toolkit:final-health": "npm run typedoc:health && npm run typedoc:json:local && npm run typedoc:check-local && npm run ai:graph:build && npm run ai:graph:doctor && npm run ai:graph:check-leaks"
->>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
+  "ai:final-health": "npm run typedoc:health && npm run typedoc:json:local && npm run typedoc:check-local && npm run ai:graph:build && npm run ai:graph:doctor && npm run ai:graph:check-leaks && npm run ai:history:status && npm run ai:test:status",
+  "toolkit:final-health": "npm run ai:final-health",
+  "ai:context:refresh": "npm run typedoc:json:local && npm run ai:graph:build",
+  "ai:context:find": "npm run ai:graph:query --",
+  "ai:context:doctor": "npm run ai:graph:doctor",
+  "ai:context:leak-check": "npm run ai:graph:check-leaks",
+  "ai:task:spec": "npm run ai:spec --",
+  "ai:task:preflight": "npm run ai:preflight --",
+  "ai:contract:inject": "npm run ai:inject-contract",
+  "ai:contract:repair": "npm run ai:repair-contract",
+  "ai:health:final": "npm run ai:final-health",
+  "toolkit:doctor": "npm run typedoc:health && npm run ai:graph:doctor",
+  "toolkit:repair-contract": "npm run ai:repair-contract",
+  "toolkit:inject-contract": "npm run ai:inject-contract",
+  "ai:history:init": "node scripts/ai/history-worklog.mjs init",
+  "ai:history:add": "node scripts/ai/history-worklog.mjs add",
+  "ai:history:refresh": "node scripts/ai/history-worklog.mjs refresh",
+  "ai:history:status": "node scripts/ai/history-worklog.mjs status",
+  "ai:memory:init": "npm run ai:history:init",
+  "ai:memory:add": "npm run ai:history:add --",
+  "ai:memory:status": "npm run ai:history:status",
+  "ai:test:smart": "node scripts/ai/test-smart-runner.mjs",
+  "ai:test:status": "node scripts/ai/test-smart-runner.mjs status",
+  "ai:validation:smart": "npm run ai:test:smart --"
 }

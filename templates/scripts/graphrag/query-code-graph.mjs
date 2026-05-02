@@ -17,7 +17,7 @@ function readCommands(relPath, line=1, needle="") {
   const pattern = safeNeedle(needle || path.basename(relPath));
   return {
     powershell: `Select-String -Path ${psQuote(relPath)} -Pattern ${psQuote(pattern)} -SimpleMatch -Context 40,60 | Select-Object -First 1`,
-    powershellGroundTruthFirst: `Select-String -Path 'AI_GROUND_TRUTH.md','AI_SYMBOL_INDEX.json' -Pattern ${psQuote(pattern)} -SimpleMatch -Context 4,8`,
+    powershellGroundTruthFirst: `Select-String -Path 'AI_GROUND_TRUTH.md','AI_SYMBOL_INDEX.json','docs/ai-changelog/START_HERE.md' -Pattern ${psQuote(pattern)} -SimpleMatch -Context 4,8`,
     bash: `sed -n '${start},${end}p' ${shellQuote(relPath)}`,
     note: "PowerShell contract: use Select-String for bounded context first; avoid broad Get-Content or rg before graph/symbol lookup."
   };
@@ -34,18 +34,19 @@ function roleForPath(relPath) {
   if (normalized.includes("/hooks/")) return "hook";
   if (normalized.includes("/components/")) return "implementation";
   if (normalized.includes("/pages/") || normalized.includes("/app/")) return "route_or_page";
+  if (normalized.startsWith("api/")) return "api_route";
   return "implementation";
 }
-function isForbidden(relPath) { return /(^|\/)(node_modules|dist|build|out|output|coverage|docs\/api[^/]*|public\/docs)(\/|$)|(^|\/)(typedoc-api(?:\.[^.\/]+)?\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock|bun\.lockb|.*\.generated\..*)$/i.test(toPosix(relPath)); }
+function isForbidden(relPath) { return /(^|\/)(node_modules|dist|build|out|output|coverage|\.next|\.nuxt|\.svelte-kit|docs\/api[^/]*|public\/docs)(\/|$)|(^|\/)(typedoc-api(?:\.[^.\/]+)?\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock|bun\.lockb|.*\.generated\..*)$/i.test(toPosix(relPath)); }
 function confidence(score) { return score >= 80 ? "high" : score >= 40 ? "medium" : "low"; }
 function keywords(text) { return String(text || "").toLowerCase().split(/[^a-z0-9_$:-]+/).filter((x) => x.length >= 2); }
-function isPatchCandidate(relPath) {
-  const role = roleForPath(relPath);
-  return !isForbidden(relPath) && !["test_contract", "source_of_truth_doc"].includes(role);
+function isSuggestedEditCandidate(relPath) {
+  return !isForbidden(relPath);
 }
 function symbolIndexMatches(symbolIndex, qWords) {
   const matches = [];
-  for (const item of symbolIndex?.symbols || []) {
+  const symbols = Array.isArray(symbolIndex?.symbols) ? symbolIndex.symbols : [];
+  for (const item of symbols) {
     const hay = `${item.name || ""} ${item.path || ""} ${item.kind || ""}`.toLowerCase();
     let score = 0;
     for (const k of qWords) if (hay.includes(k)) score += 25 + Math.min(k.length, 25);
@@ -74,7 +75,7 @@ for (const node of graph.nodes || []) {
   if (score > 0) {
     const role = roleForPath(p);
     const needle = node.name || query || path.basename(p);
-    candidates.push({ path:p, line:node.line || 1, name:node.name || path.basename(p), kind:node.kind || "file", role, score, confidence:confidence(score), patchCandidate:isPatchCandidate(p), readCommands: readCommands(p, node.line || 1, needle) });
+    candidates.push({ path:p, line:node.line || 1, name:node.name || path.basename(p), kind:node.kind || "file", role, score, confidence:confidence(score), suggestedEditCandidate:isSuggestedEditCandidate(p), readCommands: readCommands(p, node.line || 1, needle) });
   }
 }
 candidates.sort((a,b) => b.score - a.score || a.path.localeCompare(b.path));
@@ -87,19 +88,27 @@ for (const c of candidates) {
   top.push(c);
   if (top.length >= 12) break;
 }
-const allowedPatchFiles = Array.from(new Set(top.filter((c) => c.patchCandidate).map((c) => c.path))).slice(0, 8);
+const suggestedEditFiles = Array.from(new Set(top.filter((c) => c.suggestedEditCandidate).map((c) => c.path))).slice(0, 8);
 console.log(JSON.stringify({
   ok:true,
+  toolName: "AI Context Finder",
+  searchableCommand: "npm run ai:context:find -- \"<specific symbol/file/error/feature>\"",
+  compatibilityCommand: "npm run ai:graph:query -- \"<specific symbol/file/error/feature>\"",
   query,
   generatedAt: graph.generatedAt,
   mandatoryBeforeEdit: "npm run typedoc:json:local && npm run ai:graph:build",
-  sourceTruthOrder: ["AGENTS.md", "README.md", "AI_GROUND_TRUTH.md", "AI_SYMBOL_INDEX.json", ".ai/code-graph/graph.json", "Select-String bounded file context"],
+  sourceTruthOrder: ["AGENTS.md", "README.md", "docs/ai-changelog/START_HERE.md", "docs/ai-changelog/history.index.json", "AI_GROUND_TRUTH.md", "AI_SYMBOL_INDEX.json", ".ai/code-graph/graph.json", "Select-String bounded file context"],
+  editPermission: {
+    allowed: true,
+    notAWhitelist: true,
+    explanation: "suggestedEditFiles are likely relevant files only. They do not limit the AI coding agent from editing other necessary repository files after the anti-drift workflow."
+  },
   indexedSymbols,
   candidates: top,
-  allowedPatchFiles,
+  suggestedEditFiles,
   powershellContract: {
     required: "Use the returned Select-String commands before source edits.",
     avoid: ["Get-Content broad dumps", "rg broad repo search before graph/symbol lookup"]
   },
-  next: allowedPatchFiles.length ? ["Read only the returned Select-String bounded contexts.", "Patch only allowedPatchFiles unless preflight expands scope.", "After modification: npm run typedoc:json:local && npm run ai:graph:build, then validate."] : ["Make the query more specific, then run ai:preflight."]
+  next: suggestedEditFiles.length ? ["Read only the returned Select-String bounded contexts.", "Patch every necessary file for the task; suggestedEditFiles are not a whitelist.", "After important fixes: npm run ai:history:add -- --task \"<task>\" --summary \"<what changed>\"", "Use ai:test:smart for repeated validation.", "After modification: npm run typedoc:json:local && npm run ai:graph:build, then validate."] : ["Make the query more specific, then run ai:preflight."]
 }, null, 2));

@@ -1,12 +1,7 @@
 {
   "name": "ai-code-intelligence-toolkit",
-<<<<<<< HEAD
-  "version": "1.0.6",
-  "description": "Codex-compatible AI code intelligence toolkit with local graph, preflight, leak checks, and TypeDoc source-link support.",
-=======
-  "version": "1.0.5",
-  "description": "Codex-compatible local code intelligence toolkit with GraphRAG-style repo graph, smart preflight patch scoping, generated-file leak checks, and AGENTS.md workflow guardrails. Tested with Codex CLI and Codex Windows app workflow.",
->>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
+  "version": "1.0.8",
+  "description": "AI code intelligence toolkit with anti-drift task contracts, graph queries, TypeDoc source-link support, and agent-safe install injection.",
   "type": "module",
   "main": "index.js",
   "bin": {
@@ -22,7 +17,11 @@
     "index.js",
     "benchmark.json",
     "PATCH_NOTES_v1.0.6.md",
-    "VALIDATION_REPORT.md"
+    "VALIDATION_REPORT.md",
+    "PATCH_NOTES_v1.0.7.md",
+    "PATCH_NOTES_v1.0.8.md",
+    "PATCH_NOTES_v1.0.8_FINAL_DRIFT_HARDENED.md",
+    "PATCH_ROLLUP_v1.0.8_CUMULATIVE.md"
   ],
   "scripts": {
     "node-check": "node scripts/package-node-check.mjs",
@@ -30,34 +29,25 @@
     "pack:dry": "npm pack --dry-run"
   },
   "keywords": [
+    "agent-contract",
     "ai",
+    "ai-agent",
+    "ai-changelog",
+    "anti-drift",
+    "code-intelligence",
     "codex",
+    "drift-control",
     "graphrag",
-    "typedoc",
+    "ground-truth",
+    "preflight",
+    "select-string",
+    "smart-validation",
     "source-links",
-    "preflight"
+    "symbol-index",
+    "token-conservation",
+    "typedoc"
   ],
-<<<<<<< HEAD
   "license": "MIT",
-=======
-  "files": [
-    "LICENSE",
-    "README.md",
-    "TRADEMARKS.md",
-    "VALIDATION_REPORT.md",
-    "benchmark.json",
-    "index.js",
-    "PATCH_NOTES_v1.0.5.md",
-    "PATCH_NOTES_v1.0.3.md",
-    "PATCH_NOTES_v1.0.4.md",
-    "bin",
-    "docs",
-    "templates"
-  ],
-  "engines": {
-    "node": ">=20"
-  },
->>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xraisen/ai-code-intelligence-toolkit.git"

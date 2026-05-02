@@ -52,6 +52,73 @@
       "name": "AI_SYMBOL_INDEX.json",
       "path": "AI_SYMBOL_INDEX.json",
       "kind": "symbol_dictionary"
+    },
+    {
+      "name": "ai:history:init",
+      "kind": "npm-script",
+      "path": "package.json",
+      "purpose": "Initialize docs/ai-changelog durable AI memory."
+    },
+    {
+      "name": "ai:history:add",
+      "kind": "npm-script",
+      "path": "package.json",
+      "purpose": "Add a numbered markdown worklog and refresh history.index.json."
+    },
+    {
+      "name": "ai:history:status",
+      "kind": "npm-script",
+      "path": "package.json",
+      "purpose": "Inspect AI durable changelog memory."
+    },
+    {
+      "name": "ai:test:smart",
+      "kind": "npm-script",
+      "path": "package.json",
+      "purpose": "Run validation only when repository fingerprint has changed or prior run failed."
+    },
+    {
+      "name": "ai:test:status",
+      "kind": "npm-script",
+      "path": "package.json",
+      "purpose": "Show validation memory."
+    },
+    {
+      "name": "history-worklog",
+      "kind": "script",
+      "path": "scripts/ai/history-worklog.mjs",
+      "purpose": "Durable numbered AI changelog generator."
+    },
+    {
+      "name": "test-smart-runner",
+      "kind": "script",
+      "path": "scripts/ai/test-smart-runner.mjs",
+      "purpose": "Stateful smart validation runner."
+    },
+    {
+      "name": "typedoc-strict-runner",
+      "kind": "script",
+      "path": "scripts/typedoc-strict-runner.mjs",
+      "purpose": "Cross-platform strict TypeDoc runner."
+    },
+    {
+      "name": "docs/ai-changelog/START_HERE.md",
+      "kind": "memory-doc",
+      "path": "docs/ai-changelog/START_HERE.md",
+      "purpose": "Directory for historical AI coding changes."
+    },
+    {
+      "name": "docs/ai-changelog/history.index.json",
+      "kind": "memory-index",
+      "path": "docs/ai-changelog/history.index.json",
+      "purpose": "Machine-readable durable changelog index."
     }
-  ]
+  ],
+  "scripts": {
+    "inject-agent-contract": "scripts/ai/inject-agent-contract.mjs"
+  },
+  "contracts": {
+    "agentContractInjection": "Managed AGENTS.md and README.md contract injection with anti-drift use cases."
+  },
+  "updatedFor": "v1.0.8-final-drift-hardened"
 }

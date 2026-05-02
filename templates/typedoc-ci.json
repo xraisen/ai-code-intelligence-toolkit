@@ -1,16 +1,6 @@
 {
-<<<<<<< HEAD
   "extends": [
     "./typedoc.json"
-=======
-  "$schema": "https://typedoc.org/schema.json",
-  "tsconfig": "./tsconfig.doc.json",
-  "entryPoints": [
-    "src",
-    "scripts",
-    "bin",
-    "mcp"
->>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
   ],
   "skipErrorChecking": true
 }

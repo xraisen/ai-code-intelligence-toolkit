@@ -1,46 +1,9 @@
 {
   "entryPoints": [
-    "src",
-    "scripts",
-    "bin",
-    "mcp"
+    "src"
   ],
   "out": "docs/api-frontend",
-<<<<<<< HEAD
   "excludePrivate": true,
   "excludeInternal": true,
   "skipErrorChecking": true
-=======
-  "name": "Project Frontend API Documentation",
-  "includeVersion": true,
-  "readme": "README.md",
-  "tsconfig": "./tsconfig.doc.json",
-  "excludeNotDocumentedKinds": [
-    "Property",
-    "Enum"
-  ],
-  "excludeExternals": true,
-  "exclude": [
-    "**/__tests__/**",
-    "**/__mocks__/**",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/node_modules/**",
-    "node_modules/**",
-    "dist/**",
-    "build/**",
-    "coverage/**",
-    "docs/**",
-    "public/docs/**",
-    ".ai/code-graph/**"
-  ],
-  "disableSources": false,
-  "sourceLinkTemplate": "{path}#L{line}",
-  "sidebarLinks": {
-    "Documentation": "/docs/",
-    "Frontend API": "/docs/api-frontend/"
-  }
->>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138
 }

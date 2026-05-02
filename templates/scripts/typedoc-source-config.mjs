@@ -59,7 +59,6 @@ function localOutDir(input) {
   return input.includes("frontend") ? "docs/api-frontend-local" : "docs/api-local";
 }
 
-<<<<<<< HEAD
 const requestedMode = modeArg === "github" || modeArg === "local" ? modeArg : "auto";
 const selectedMode = requestedMode === "auto" ? (process.env.CI || process.env.GITHUB_ACTIONS ? "github" : "local") : requestedMode;
 const input = readJson(inputConfig, {});
@@ -93,94 +92,3 @@ console.log(JSON.stringify({
   entryPoints: generated.entryPoints,
   entryPointNormalization
 }, null, 2));
-=======
-
-function pathExistsFromRoot(relPath) {
-  return fs.existsSync(path.resolve(cwd, relPath));
-}
-
-function normalizeEntryPointsForExistingRepo(config) {
-  const requested = Array.isArray(config.entryPoints) ? config.entryPoints : [];
-  const existingRequested = requested.filter((entry) => typeof entry === "string" && pathExistsFromRoot(entry));
-
-  if (existingRequested.length) {
-    config.entryPoints = existingRequested;
-    return { changed: existingRequested.length !== requested.length, entryPoints: config.entryPoints, fallbackUsed: false };
-  }
-
-  const fallbackCandidates = [
-    "src",
-    "scripts",
-    "bin",
-    "mcp",
-    "templates/scripts",
-    "templates/bin",
-  ];
-  const fallback = fallbackCandidates.filter((entry) => pathExistsFromRoot(entry));
-
-  if (fallback.length) {
-    config.entryPoints = fallback;
-    return { changed: true, entryPoints: config.entryPoints, fallbackUsed: true };
-  }
-
-  const placeholderDir = path.join(cwd, ".ai", "typedoc");
-  const placeholderFile = path.join(placeholderDir, "empty-entry.ts");
-  fs.mkdirSync(placeholderDir, { recursive: true });
-  if (!fs.existsSync(placeholderFile)) {
-    fs.writeFileSync(placeholderFile, "export {};\n");
-  }
-  config.entryPoints = [".ai/typedoc/empty-entry.ts"];
-  return { changed: true, entryPoints: config.entryPoints, fallbackUsed: true, placeholder: ".ai/typedoc/empty-entry.ts" };
-}
-
-const selectedMode = selectMode();
-const config = readJsonc(baseConfigPath);
-const baseName = path.basename(baseConfigPath);
-const isFrontendConfig = baseName.includes("frontend");
-
-hardenForDocs(config);
-const entryPointNormalization = normalizeEntryPointsForExistingRepo(config);
-
-if (selectedMode === "local") {
-  const projectRoot = path.resolve(process.env.TYPEDOC_PROJECT_ROOT || cwd);
-  const vscodeRoot = normalizeVscodeRoot(projectRoot);
-  config.out = isFrontendConfig ? "docs/api-frontend-local" : "docs/api-local";
-  config.sourceLinkTemplate = `${vscodeRoot}/{path}:{line}`;
-}
-
-if (selectedMode === "github") {
-  const repository = getGithubRepository();
-  const revision = getGithubRevision();
-  config.out = isFrontendConfig ? "docs/api-frontend-github" : "docs/api-github";
-  config.sourceLinkTemplate = `https://github.com/${repository}/blob/${revision}/{path}#L{line}`;
-}
-
-config.sidebarLinks = {
-  ...(config.sidebarLinks || {}),
-  "API Local": isFrontendConfig ? "/docs/api-frontend-local/" : "/docs/api-local/",
-  "API GitHub": isFrontendConfig ? "/docs/api-frontend-github/" : "/docs/api-github/",
-};
-
-const outputPath = generatedConfigName(baseConfigPath, selectedMode);
-fs.writeFileSync(outputPath, `${JSON.stringify(config, null, 2)}\n`);
-
-console.log(
-  JSON.stringify(
-    {
-      ok: true,
-      requestedMode,
-      selectedMode,
-      input: path.relative(cwd, baseConfigPath),
-      output: path.relative(cwd, outputPath),
-      outDir: config.out,
-      skipErrorChecking: config.skipErrorChecking,
-      sourceLinkTemplate: config.sourceLinkTemplate,
-      excludeCount: config.exclude?.length ?? 0,
-      entryPoints: config.entryPoints,
-      entryPointNormalization,
-    },
-    null,
-    2
-  )
-);
->>>>>>> 4e1b796e6def765beb5e3edbe89a48d4420cb138

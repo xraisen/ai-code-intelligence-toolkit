@@ -56,3 +56,36 @@ Do not use broad `Get-Content` file dumps or `rg` as the first navigation move. 
   contract: generate local TypeDoc JSON before graph build and AI source navigation
 
 Add project-specific symbols here after installing the toolkit.
+
+## Agent contract injection
+
+- `scripts/ai/inject-agent-contract.mjs` repairs and reinjects the managed AGENTS.md and README.md anti-drift contract.
+- `npm run ai:inject-contract` must leave no Git conflict markers in managed instructions.
+- The injected contract includes use-case examples for UI/layout, backend/API, known-symbol, and database/RLS work.
+
+
+## v1.0.8 Final Drift-Hardened Additions
+
+### Durable history / AI memory
+
+- `docs/ai-changelog/START_HERE.md` is the first lookback document for prior fixes.
+- `docs/ai-changelog/history.index.json` is the machine-readable index of numbered fixes.
+- `scripts/ai/history-worklog.mjs` creates and refreshes numbered changelog entries.
+- Commands:
+  - `npm run ai:history:init`
+  - `npm run ai:history:status`
+  - `npm run ai:history:add -- --task "<task>" --summary "<what changed>"`
+  - `npm run ai:history:refresh`
+
+### Smart validation memory
+
+- `scripts/ai/test-smart-runner.mjs` prevents repeated validation runs when the same command already passed for the unchanged repository fingerprint.
+- Commands:
+  - `npm run ai:test:status`
+  - `npm run ai:test:smart -- "npm run test"`
+  - `npm run ai:test:smart -- "npm run build"`
+
+### Cross-platform strict TypeDoc
+
+- `scripts/typedoc-strict-runner.mjs` replaces shell-specific inline environment assignment.
+- Use `npm run typedoc:strict` on Windows, macOS, or Linux.
