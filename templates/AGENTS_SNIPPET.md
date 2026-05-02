@@ -1,26 +1,12 @@
-# AI Code Intelligence Toolkit Agent Contract
+# Agent Contract Template
 
-This repository uses **AI Code Intelligence Toolkit** and **TypeDoc Hybrid Source Links**.
+This template is intended to be injected into `AGENTS.md` by the installer. It is a coding-agent operating contract, not a human-only note.
 
-This contract is mandatory for AI coding agents. If a task conflicts with this contract, stop and explain the conflict instead of guessing.
+## Non-negotiable anti-drift workflow
 
----
+Before editing source code, config, tests, docs, scripts, or generated-tooling behavior, always run and wait for:
 
-## Required companion tools
-
-```bash
-npm install --save-dev ai-code-intelligence-toolkit typedoc-hybrid-source-links typedoc
-npx typedoc-hybrid-install --target . --overwrite
-npx ai-code-intel-install --target . --overwrite --strict
-```
-
----
-
-## Non-negotiable anti-drift startup
-
-Before reading implementation files, planning patches, or editing source code, always run and wait for:
-
-```bash
+```powershell
 npm run ai:history:status
 npm run typedoc:json:local && npm run ai:graph:build
 npm run ai:spec -- "<task>"
@@ -28,184 +14,124 @@ npm run ai:preflight -- "<task>"
 npm run ai:graph:query -- "<specific symbol/file/error/feature>"
 ```
 
-Do not touch source files until the task goal is understood and the relevant files/symbols are located.
-
----
+The agent must understand the task goal, prior history, relevant files, and likely symbols before touching implementation files.
 
 ## Edit permission
 
-After the anti-drift workflow completes, the AI coding agent may edit every repository file necessary to complete the task correctly.
+After the anti-drift workflow completes, the AI coding agent may edit every repository file required to complete the requested task correctly.
 
-`ai:spec`, `ai:preflight`, and `ai:graph:query` are discovery and safety tools. They are not hard edit whitelists.
+`ai:spec`, `ai:preflight`, and `ai:graph:query` are discovery and safety tools. They are not a hard patch whitelist. Do not refuse necessary edits only because a file is absent from `suggestedEditFiles`.
 
-Do not refuse to edit a required file only because it was not listed in preflight output.
-
----
+Avoid hand-editing generated files, build outputs, dependency folders, archives, and TypeDoc JSON unless the task is specifically about generated documentation, generated artifacts, or toolkit behavior.
 
 ## Source-of-truth order
-
-Use this order before implementation reads:
 
 1. `AGENTS.md`
 2. `docs/ai-changelog/START_HERE.md`
 3. `docs/ai-changelog/history.index.json`
 4. `AI_GROUND_TRUTH.md`
 5. `AI_SYMBOL_INDEX.json`
-6. `.ai/code-graph/graph.json`, only after current-cycle graph build
-7. Targeted source context windows
-
-`AI_GROUND_TRUTH.md` is the repo directory and contract map.
-
-`AI_SYMBOL_INDEX.json` is the symbol dictionary.
-
-`docs/ai-changelog` is durable project memory. Check it before reopening old issues.
-
----
+6. `.ai/code-graph/graph.json`, only after the current-cycle graph build
+7. Targeted source windows only
 
 ## PowerShell context contract
 
-Use bounded `Select-String` reads before source edits:
+Use bounded `Select-String` reads first:
 
 ```powershell
 Select-String -Path "AI_GROUND_TRUTH.md","AI_SYMBOL_INDEX.json","docs/ai-changelog/START_HERE.md" -Pattern "<symbol or file>" -SimpleMatch -Context 4,8
 Select-String -Path "<exact-file-from-graph-query>" -Pattern "<specific-symbol-or-phrase>" -SimpleMatch -Context 40,60
 ```
 
-Avoid broad first-pass reads:
-
-```powershell
-Get-Content <entire-large-file>
-rg "vague query"
-```
-
-Use broader search only after graph/symbol lookup fails or the exact target area is known.
-
----
+Do not use broad `Get-Content` file dumps or broad `rg` as the first repo navigation step. Use wider search only after graph/symbol lookup fails or the task explicitly requires repository-wide investigation.
 
 ## Token conservation rules
 
-- Start with durable history and symbol maps, not raw source dumps.
-- Prefer exact symbol/file queries over broad repository scans.
-- Use bounded context windows.
-- Do not repeatedly run the same successful validation on the same unchanged repo state.
-- Use `npm run ai:test:status` before repeating expensive tests.
-- Use `npm run ai:test:smart -- "<command>"` for validation commands.
+- Read durable history and maps before source files.
+- Prefer exact symbol/file lookups over broad reading.
+- Prefer graph query candidates before opening implementation files.
+- Use `ai:test:status` before repeating expensive validation.
+- Use `ai:test:smart` for build, lint, and tests.
+- Do not repeat a successful unchanged validation unless `--force` is intentional.
 
----
+## Required history memory
 
-## Required validation memory
+Record important fixes, bugs, behavior changes, and tool changes:
 
-Before validation:
-
-```bash
-npm run ai:test:status
-```
-
-Run validations through:
-
-```bash
-npm run ai:test:smart -- "npm run build"
-npm run ai:test:smart -- "npm run lint"
-npm run ai:test:smart -- "npm test"
-```
-
-Do not rerun an unchanged passing validation unless there is a reason or `--force` is intentional.
-
----
-
-## Required changelog memory
-
-After important modifications, add a numbered memory entry:
-
-```bash
+```powershell
 npm run ai:history:add -- --task "<task>" --summary "<what changed>" --files "file1,file2" --validation "npm run build"
 ```
 
-Refresh if needed:
+The repository should keep numbered Markdown entries under:
 
-```bash
-npm run ai:history:refresh
+```text
+docs/ai-changelog/
 ```
 
-This prevents future agents from reverting fixed bugs or forgetting why changes were made.
+`START_HERE.md` and `history.index.json` are the lookup directory for future agents.
 
----
+## After modifications
 
-## After modification
+Run suitable validation through smart validation:
 
-If modifications are made and another edit cycle is needed, rerun:
+```powershell
+npm run ai:test:smart -- "npm run build"
+npm run ai:test:smart -- "npm run test"
+npm run ai:test:smart -- "npm run lint"
+```
 
-```bash
+Then record the work:
+
+```powershell
+npm run ai:history:add -- --task "<task>" --summary "<what changed>" --validation "<validation command>"
+```
+
+Before the next edit cycle, refresh context again:
+
+```powershell
 npm run typedoc:json:local && npm run ai:graph:build
-npm run ai:spec -- "<task>"
-npm run ai:preflight -- "<task>"
-npm run ai:graph:query -- "<specific symbol/file/error/feature>"
 ```
 
-Before final commit:
+## Use-case scenarios
 
-```bash
-npm run ai:final-health
-```
+### UI/layout issue
 
----
-
-## Common task scenarios
-
-### UI/layout task
-
-```bash
+```powershell
 npm run ai:history:status
 npm run typedoc:json:local && npm run ai:graph:build
-npm run ai:spec -- "Fix dashboard spacing, list overflow, side panel layout, and text clipping"
-npm run ai:preflight -- "Fix dashboard spacing, list overflow, side panel layout, and text clipping"
+npm run ai:spec -- "Fix dashboard spacing, list overflow, panel layout, and text clipping"
+npm run ai:preflight -- "Fix dashboard spacing, list overflow, panel layout, and text clipping"
 npm run ai:graph:query -- "dashboard layout side panel list view App"
 ```
 
-### Backend/API task
+### Backend/API issue
 
-```bash
+```powershell
 npm run ai:history:status
 npm run typedoc:json:local && npm run ai:graph:build
-npm run ai:spec -- "Fix readiness endpoint and webhook validation"
-npm run ai:preflight -- "Fix readiness endpoint and webhook validation"
-npm run ai:graph:query -- "readiness endpoint webhook validation api"
+npm run ai:spec -- "Fix readiness endpoint, webhook validation, and server-side permission checks"
+npm run ai:preflight -- "Fix readiness endpoint, webhook validation, and server-side permission checks"
+npm run ai:graph:query -- "readiness webhook permissions api"
 ```
 
-### Known symbol/file task
+### TypeDoc/source-link issue
 
-```bash
+```powershell
 npm run typedoc:json:local && npm run ai:graph:build
-npm run ai:spec -- "Fix <specific symbol> behavior"
-npm run ai:preflight -- "Fix <specific symbol> behavior"
-npm run ai:graph:query -- "<specific symbol>"
+npm run ai:spec -- "Fix TypeDoc local source links and entrypoint handling"
+npm run ai:preflight -- "Fix TypeDoc local source links and entrypoint handling"
+npm run ai:graph:query -- "typedoc-source-config entryPointStrategy sourceLinkTemplate"
 ```
 
-### Documentation/tooling task
+## Final health gate
 
-```bash
-npm run typedoc:json:local && npm run ai:graph:build
-npm run ai:spec -- "Fix TypeDoc source link generation"
-npm run ai:preflight -- "Fix TypeDoc source link generation"
-npm run ai:graph:query -- "typedoc-source-config sourceLinkTemplate entryPointStrategy"
+```powershell
+npm run typedoc:health
+npm run typedoc:json:local
+npm run typedoc:check-local
+npm run ai:graph:build
+npm run ai:graph:doctor
+npm run ai:graph:check-leaks
+npm run ai:history:status
+npm run ai:test:status
 ```
-
----
-
-## Generated and build outputs
-
-Avoid hand-editing these unless the task specifically concerns generated docs/tooling:
-
-```txt
-node_modules/
-dist/
-docs/api-local/
-typedoc-api.json
-typedoc.local.generated.json
-typedoc.github.generated.json
-.ai/code-graph/graph.json
-*.tgz
-*.zip
-```
-
-Regenerate them through scripts instead.
